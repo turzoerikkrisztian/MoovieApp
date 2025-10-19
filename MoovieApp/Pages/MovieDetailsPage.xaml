@@ -2,11 +2,32 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MoovieApp.Pages.MovieDetailsPage"
-             Title="MovieDetailsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             xmlns:vm="clr-namespace:MoovieApp.ViewModels"
+             x:DataType="vm:DetailViewModel"
+             BackgroundColor="Black"
+             Title="Details"             
+             Shell.BackgroundColor="Red">
+    <ScrollView BackgroundColor="Black">
+        <Grid>
+            <ActivityIndicator Color="White"
+                               VerticalOptions="Center"
+                               HorizontalOptions="Center"
+                               HeightRequest="50"
+                               WidthRequest="50"
+                               IsRunning="{Binding IsBusy}"/>
+            
+            <VerticalStackLayout IsVisible="False">
+                <VerticalStackLayout.Triggers>
+                    <DataTrigger TargetType="VerticalStackLayout"
+                                     Binding="{Binding IsBusy}"
+                                     Value="False">
+                        <Setter Property="IsVisible"
+                                Value="True"/>
+                    </DataTrigger>
+                </VerticalStackLayout.Triggers>
+                <WebView Source="{Binding MainTrailerUrl}"
+                         HeightRequest="250"/>
+            </VerticalStackLayout>
+        </Grid>
+    </ScrollView>
 </ContentPage>

@@ -84,7 +84,8 @@
                 <Grid Grid.Column="1">
                     <ImageButton Source="star_rate.svg"/>
                 </Grid>
-                <Grid Grid.Column="2">
+                <Grid Grid.Column="2"
+                      >
                     <ImageButton Source="info.svg"
                                  Clicked="ImageButton_Details_Clicked"/>
                 </Grid>

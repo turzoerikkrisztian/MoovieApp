@@ -41,10 +41,10 @@ public partial class MovieInfoBox : ContentView
 
     private async void ImageButton_Details_Clicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"{nameof(MovieDetailsPage)}",
-            new Dictionary<string, object>
-            {
-                { "MovieViewModel", new MovieDetailsViewModel(Movie) }
-            });
+        var parameters = new Dictionary<string, object>
+        {
+            [nameof(DetailViewModel.Movie)] = Movie
+        };
+        await Shell.Current.GoToAsync(nameof(MovieDetailsPage), true, parameters);
     }
 }

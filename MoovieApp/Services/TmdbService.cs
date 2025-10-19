@@ -23,6 +23,19 @@ namespace MoovieApp.Services
         public async Task<IEnumerable<MovieModel>> GetTopRatedMoviesAsync() =>
             await GetMovieModelsAsync(TmdbUrls.TopRated);
 
+        public async Task<IEnumerable<Video>?> GetTrailersAsync(int id)
+        {
+            var videosWrapper = await HttpClient.GetFromJsonAsync<VideosWrapper>(
+                $"{TmdbUrls.GetTrailers(id)}&api_key={ApiKey}");
+
+            if (videosWrapper?.results?.Length > 0)
+            {
+                var trailers = videosWrapper.results.Where(VideosWrapper.FilterTrailerTeasers);
+                return trailers;
+            }
+            return null;
+        }
+
 
         private async Task<IEnumerable<MovieModel>> GetMovieModelsAsync(string url)
         {
