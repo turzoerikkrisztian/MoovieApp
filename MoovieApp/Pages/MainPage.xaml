@@ -1,0 +1,98 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:MoovieApp.Controls"
+             x:Class="MoovieApp.Pages.MainPage"
+             Shell.NavBarIsVisible="False"
+             Shell.TabBarUnselectedColor="White"
+             BackgroundColor="Red"
+             xmlns:vm="clr-namespace:MoovieApp.ViewModels"
+             x:DataType="vm:HomeViewModel">
+    <Grid>
+  <ScrollView>
+            <VerticalStackLayout Spacing="0" Padding="0">
+                <Grid>
+                    <Border StrokeShape="RoundRectangle 0,0,10,10" 
+                BackgroundColor="Black"
+                
+                HorizontalOptions="Center"
+                VerticalOptions="Start">
+                <Image
+            
+                Aspect="AspectFit"
+                HeightRequest="600"
+                Source="{Binding TrendingMovie.Thumbnail}" 
+                    />
+            </Border>
+                    <Grid ColumnDefinitions="*, auto, *"
+                          Margin="0"
+                          >
+                        <Grid Grid.Column="0"
+                              VerticalOptions="Start"
+                              >
+                            
+                        </Grid>
+                        <Grid Grid.Column="1">      
+            <Border StrokeShape="RoundRectangle 0,0,10,10" 
+                    BackgroundColor="Black"
+                    Opacity="0.9"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Start">
+                        
+               <Label Text="Welcome To Moovie!" 
+                   HorizontalOptions="Center"
+                   FontSize="30"
+                   TextColor="Red"                   
+                   FontAttributes="Bold"/>
+                        
+                    </Border>
+                        </Grid>
+                    </Grid>
+                    <HorizontalStackLayout
+            HorizontalOptions="Center"
+            VerticalOptions="End"
+            Margin="0,0,0,10"
+            Spacing="40"
+            Opacity="0.9">
+
+                <ImageButton
+                Source="list_alt.svg"                
+                BackgroundColor="Black"
+                CornerRadius="10"
+                Aspect="AspectFit"/>
+
+                <ImageButton
+                Source="star_rate.svg"                
+                BackgroundColor="Black"
+                CornerRadius="10"
+                Aspect="AspectFit"/>
+
+                <ImageButton
+                Source="info.svg"                
+                BackgroundColor="Black"
+                CornerRadius="10"
+                Aspect="AspectFit"
+                Command="{Binding SelectMovieCommand}"
+                    CommandParameter="{Binding TrendingMovie}"/>
+            </HorizontalStackLayout>
+                
+            </Grid>
+            <controls:MovieRow Heading="Trending Movies" 
+            Movies="{Binding TrendingMovies}" 
+            OnMovieSelected="MovieRow_OnMovieSelected"/>
+            <controls:MovieRow Heading="Top Rated Movies" 
+                Movies="{Binding TopRatedMovies}" 
+                               OnMovieSelected="MovieRow_OnMovieSelected"/>
+           
+
+
+        </VerticalStackLayout>
+       
+    </ScrollView>
+        <controls:MovieInfoBox Movie="{Binding SelectedMovie}" 
+                               VerticalOptions="End"
+                               IsVisible="{Binding ShowMovieInfoBox}"
+                               Closed="MovieInfoBox_Closed"
+                               />
+  </Grid>
+</ContentPage>

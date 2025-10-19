@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="MoovieApp.Controls.MovieInfoBox"
+             xmlns:controls="clr-namespace:MoovieApp.Controls"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Name="this"
+             Padding="0"
+             Margin="0">
+    
+    <Border BindingContext="{x:Reference this}"
+            StrokeShape="RoundRectangle 10, 10, 0, 0"
+            StrokeThickness="0"
+            BackgroundColor="#2b2b2b"
+            Margin="0"
+            Padding="0">
+        <VerticalStackLayout Padding="0">
+            <Grid RowDefinitions="Auto, Auto, Auto"
+                  ColumnDefinitions="120, *"
+                  Padding="10"
+                  ColumnSpacing="10">
+                <Border Grid.Column="0"
+                        Grid.RowSpan="3"
+                        HeightRequest="150"
+                        WidthRequest="120"
+                        StrokeShape="RoundRectangle 5"
+                        Stroke="#2b2b2b"
+                        StrokeThickness="0"
+                        Padding="0">
+                    <Image Aspect="AspectFill"                           
+                           HeightRequest="150"
+                           WidthRequest="120">
+                        <Image.Source >
+                            <UriImageSource Uri="{Binding Movie.Thumbnail}"/>
+                        </Image.Source>
+                    </Image>
+                </Border>
+                <Grid Grid.Row="0"
+                      Grid.Column="1"
+                      ColumnDefinitions="*, Auto">
+                    <Border StrokeShape="RoundRectangle 5"
+                            BackgroundColor="Black"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Start"
+                            Padding="4">
+                    <Label Grid.Column="0"
+                           Text="{Binding Movie.DisplayTitle, FallbackValue='Movie Title'}"
+                           FontSize="17"
+                           FontAttributes="Bold"
+                           TextColor="red"
+                           />
+                    </Border>
+                    <ImageButton          
+                        Grid.Column="1"
+                        Margin="4"
+                        HeightRequest="35"
+                        WidthRequest="35"
+                        Source="cancel.svg"
+                        VerticalOptions="Start"
+                        CornerRadius="40"
+                        BackgroundColor="Black"
+                        Command="{Binding ClosedCommand}"
+                        Clicked="ImageButton_Clicked"
+                         />
+                </Grid>
+                <Label Grid.Row="1"
+                       Grid.Column="1"
+                       Text="{Binding Movie.ReleaseDate}"
+                       TextColor="AntiqueWhite"
+                       FontSize="12"/>
+
+                <Label Grid.Row="2"
+                       Grid.Column="1"
+                       Text="{Binding Movie.Overview}"
+                       TextColor="AntiqueWhite"
+                       />
+            </Grid>
+
+            <Grid ColumnDefinitions="*, *, *"
+                  Margin="0, 5, 0, 5">
+                <Grid Grid.Column="0">
+                    <ImageButton Source="list_alt.svg"/>
+                </Grid>
+                <Grid Grid.Column="1">
+                    <ImageButton Source="star_rate.svg"/>
+                </Grid>
+                <Grid Grid.Column="2">
+                    <ImageButton Source="info.svg"
+                                 Clicked="ImageButton_Details_Clicked"/>
+                </Grid>
+
+            </Grid>
+
+            <BoxView HeightRequest="2"
+                     Background="#9d9d9d"
+                     Margin="5, 0"/>
+
+            
+
+
+
+        </VerticalStackLayout>
+    </Border>
+
+</ContentView>

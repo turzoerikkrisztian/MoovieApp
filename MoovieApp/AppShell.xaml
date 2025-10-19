@@ -3,13 +3,30 @@
     x:Class="MoovieApp.AppShell"
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:local="clr-namespace:MoovieApp"
+    xmlns:pages="clr-namespace:MoovieApp.Pages"
     Shell.FlyoutBehavior="Disabled"
-    Title="MoovieApp">
+    Title="MoovieApp"
+    >
 
-    <ShellContent
-        Title="MoovieApp"
-        ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+    <TabBar >
+        <ShellContent 
+            Title="Home"
+            Icon="home.svg"
+            ContentTemplate="{DataTemplate pages:MainPage}"
+            Route="MainPage" 
+            />
+        <ShellContent 
+            Title="For You"
+            Icon="sentiment_satisfied.svg"
+            ContentTemplate="{DataTemplate pages:ForYouPage}"
+            Route="ForYouPage" />
+        <ShellContent 
+            Title="Profile"
+            Icon="for_you.svg"
+            ContentTemplate="{DataTemplate pages:UserDetailsPage}"
+            Route="UserDetailsPage" />
+        
 
+        
+    </TabBar>
 </Shell>
