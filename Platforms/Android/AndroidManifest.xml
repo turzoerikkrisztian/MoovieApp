@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="com.companyname.myapp">
+  <!-- Ensure permissions are direct children of <manifest> and the android: namespace is declared above -->
+  <uses-permission android:name="android.permission.INTERNET" />
+
+  <application
+      android:label="MyApp"
+      android:icon="@mipmap/ic_launcher">
+    <!-- Application components (activities, services) go here -->
+  </application>
+</manifest>

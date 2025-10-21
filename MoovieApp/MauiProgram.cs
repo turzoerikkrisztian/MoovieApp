@@ -33,6 +33,27 @@ public static class MauiProgram
         builder.Services.AddTransient<DetailViewModel>();
         builder.Services.AddTransient<MovieDetailsPage>();
 
+#if ANDROID
+Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
+{
+    if (handler.PlatformView is Android.Webkit.WebView androidWebView)
+    {
+        androidWebView.Settings.JavaScriptEnabled = true;
+        androidWebView.Settings.MediaPlaybackRequiresUserGesture = false;
+    }
+});
+#endif
+
+#if IOS
+        Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
+        {
+            if (handler.PlatformView is WebKit.WKWebView wk)
+            {
+                wk.Configuration.AllowsInlineMediaPlayback = true;
+            }
+        });
+#endif
+
         return builder.Build();
     }
 }

@@ -1,5 +1,7 @@
 ﻿using MoovieApp.Models;
+using System.Formats.Asn1;
 using System.Net.Http.Json;
+using static Microsoft.Maui.ApplicationModel.Permissions;
 
 namespace MoovieApp.Services
 {
@@ -23,6 +25,10 @@ namespace MoovieApp.Services
         public async Task<IEnumerable<MovieModel>> GetTopRatedMoviesAsync() =>
             await GetMovieModelsAsync(TmdbUrls.TopRated);
 
+        public async Task<IEnumerable<MovieModel>> GetSimilarAsync(int movieId) =>
+            await GetMovieModelsAsync(TmdbUrls.GetSimilar(movieId));
+
+
         public async Task<IEnumerable<Video>?> GetTrailersAsync(int id)
         {
             var videosWrapper = await HttpClient.GetFromJsonAsync<VideosWrapper>(
@@ -37,12 +43,21 @@ namespace MoovieApp.Services
         }
 
 
+        public async Task<MovieDetail?> GetMovieDetailsAsync(int id)
+        {
+            var movieDetails = await HttpClient.GetFromJsonAsync<MovieDetail>(
+                $"{TmdbUrls.GetMovieDetails(id)}&api_key={ApiKey}");
+            return movieDetails;
+        }   
+
         private async Task<IEnumerable<MovieModel>> GetMovieModelsAsync(string url)
         {
             var moviesCollection = await HttpClient.GetFromJsonAsync<Movie>($"{url}&api_key={ApiKey}");
             return moviesCollection.results
                     .Select(r => r.ToMovieObject());
         }
+
+       
     }
 
     public static class TmdbUrls
@@ -50,9 +65,13 @@ namespace MoovieApp.Services
         public const string Trending = "3/trending/movie/week?language=en-US";
         public const string Search = "3/search/movie";
         public const string TopRated = "3/movie/top_rated?language=en-US";
+        
 
         public static string GetTrailers(int movieId, string type = "movie") => $"3/{type ?? "movie"}/{movieId}/videos?language=en-US";
         public static string GetMovieDetails(int movieId, string type = "movie") => $"3/{type ?? "movie"}/{movieId}?language=en-US";
+        public static string GetSimilar(int movieId, string type = "movie") => $"3/{type ?? "movie"}/{movieId}/similar?language=en-US";
+
+
     }
 
     public class Movie
