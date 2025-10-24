@@ -16,7 +16,7 @@ namespace MoovieApp.ViewModels
         public HomeViewModel(TmdbService tmdbService, DatabaseService databaseService)
         {
             _tmdbService = tmdbService;
-            _databaseService = databaseService;
+            _databaseService = databaseService; // Should get assigned here
         }
 
 
@@ -92,10 +92,11 @@ namespace MoovieApp.ViewModels
         }
 
         [RelayCommand]
-        private async Task AddToMyListAsync()
+        private async Task AddToMyListAsync(MovieModel? movie)
         {
-            // Itt a TrendingMovie-ra hajtjuk végre a műveletet
-            if (TrendingMovie is null) return;
+
+            movie ??= TrendingMovie;
+            if (movie is null) return;
 
             try
             {
@@ -114,10 +115,11 @@ namespace MoovieApp.ViewModels
         }
 
         [RelayCommand]
-        private async Task RateMovieAsync()
+        private async Task RateMovieAsync(MovieModel? movie)
         {
-            
-            if (TrendingMovie is null) return;
+
+            movie ??= TrendingMovie;
+            if (movie is null) return;
 
             string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{TrendingMovie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
 

@@ -96,6 +96,8 @@
                                VerticalOptions="End"
                                IsVisible="{Binding ShowMovieInfoBox}"
                                Closed="MovieInfoBox_Closed"
+                               AddToListClicked="MovieInfoBox_AddToListClicked" 
+                               RateClicked="MovieInfoBox_RateClicked"
                                />
   </Grid>
 </ContentPage>

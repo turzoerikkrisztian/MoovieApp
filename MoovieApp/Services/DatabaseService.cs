@@ -19,7 +19,7 @@ namespace MoovieApp.Services
             _databaseLazyInitializer = new Lazy<Task<SQLiteAsyncConnection>>(async () =>
             {               
                 var database = new SQLiteAsyncConnection(DbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-                await InitDatabaseAsync(database); // Meghívjuk a táblalétrehozást
+                await InitDatabaseAsync(database); 
                 return database;
             });
         }
@@ -43,14 +43,17 @@ namespace MoovieApp.Services
         }
 
         public async Task AddMovieToListAsync(int userId, int movieId, string title, string posterUrl)
-        {            
+        {
+            var db = await GetDatabaseAsync();
+
             var movie = new MovieObject
             {
                 movie_id = movieId,
                 title = title,
                 poster_url = posterUrl
             };
-            await _database.InsertOrReplaceAsync(movie);
+            
+            await db.InsertOrReplaceAsync(movie); 
 
             var listItem = new UserList
             {
@@ -58,38 +61,45 @@ namespace MoovieApp.Services
                 movie_id = movieId
             };
 
-            var existing = await _database.Table<UserList>()
-                                        .Where(x => x.user_id == userId && x.movie_id == movieId)
-                                        .FirstOrDefaultAsync();
+            
+            var existing = await db.Table<UserList>()
+                                    .Where(x => x.user_id == userId && x.movie_id == movieId)
+                                    .FirstOrDefaultAsync();
             if (existing == null)
             {
-                await _database.InsertAsync(listItem);
+                
+                await db.InsertAsync(listItem);
             }
         }
 
         public async Task RateMovieAsync(int userId, int movieId, int rating, string ratingText = null)
         {
+            var db = await GetDatabaseAsync();
+
             var newRating = new Rating
-            {   
+            {
                 user_id = userId,
                 movie_id = movieId,
                 rating = rating,
                 rating_text = ratingText
             };
-            await _database.InsertOrReplaceAsync(newRating);
+           
+            await db.InsertOrReplaceAsync(newRating);
         }
 
         public async Task<List<MovieObject>> GetUserListAsync(int userId)
         {
-            var userListItems = await _database.Table<UserList>()
-                                             .Where(x => x.user_id == userId)
-                                             .ToListAsync();
-        
+            var db = await GetDatabaseAsync(); 
+
+            var userListItems = await db.Table<UserList>()         
+                                         .Where(x => x.user_id == userId)
+                                         .ToListAsync();
+
             var movieIds = userListItems.Select(x => x.movie_id).ToList();
-            
-            return await _database.Table<MovieObject>()
-                                .Where(m => movieIds.Contains(m.movie_id))
-                                .ToListAsync();
+
+            return await db.Table<MovieObject>()
+                            .Where(m => movieIds.Contains(m.movie_id))
+                            .ToListAsync();
         }
     }
 }

@@ -17,7 +17,7 @@ public static class MauiProgram
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("BBHSansHegarty-Regular.ttf", "BBHSansHegartyRegular");
-                fonts.AddFont("BBHSansHegarty-Semibold.ttf", "BBHSansHegartySemibold");
+                //fonts.AddFont("BBHSansHegarty-Semibold.ttf", "BBHSansHegartySemibold");
             });
 
 #if DEBUG

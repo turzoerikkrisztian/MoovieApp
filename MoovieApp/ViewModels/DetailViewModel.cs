@@ -18,7 +18,7 @@ namespace MoovieApp.ViewModels
         public DetailViewModel(TmdbService tmdbService, DatabaseService databaseService)
         {
             _tmdbService = tmdbService;
-            _databaseService = databaseService;
+            _databaseService = databaseService; // Should get assigned here
         }
 
 

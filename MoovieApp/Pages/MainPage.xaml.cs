@@ -1,4 +1,6 @@
 ﻿using MoovieApp.ViewModels;
+using MoovieApp.Controls;
+using CommunityToolkit.Mvvm.Input;
 
 namespace MoovieApp.Pages
 {
@@ -38,6 +40,24 @@ namespace MoovieApp.Pages
         private void MovieInfoBox_Closed(object sender, EventArgs e)
         {
             _homeViewModel.SelectMovieCommand.Execute(null);
+        }
+
+
+
+        private async void MovieInfoBox_AddToListClicked(object? sender, MovieEventArgs e)
+        {            
+            if (e.Movie != null && _homeViewModel.AddToMyListCommand.CanExecute(e.Movie))
+            {                
+                await _homeViewModel.AddToMyListCommand.ExecuteAsync(e.Movie);
+            }
+        }
+
+        private async void MovieInfoBox_RateClicked(object? sender, MovieEventArgs e)
+        {            
+            if (e.Movie != null && _homeViewModel.RateMovieCommand.CanExecute(e.Movie))
+            {                
+                await _homeViewModel.RateMovieCommand.ExecuteAsync(e.Movie);
+            }
         }
     }
 
