@@ -55,10 +55,12 @@
                     <Grid ColumnDefinitions="*, *"
                         Margin="0, 50, 0, 5">
                         <Grid Grid.Column="0">
-                            <ImageButton Source="list_alt.svg"/>
+                            <ImageButton Source="list_alt.svg"
+                                         Command="{Binding AddToMyListCommand}"/>
                         </Grid>
                         <Grid Grid.Column="1">
-                            <ImageButton Source="star_rate.svg"/>
+                            <ImageButton Source="star_rate.svg"
+                                         Command="{Binding RateMovieCommand}"/>
                         </Grid>
                         <Grid Grid.Column="2">
                         </Grid>

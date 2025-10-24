@@ -1,4 +1,5 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using MoovieApp.Models;
 using MoovieApp.Services;
 using System.Collections.ObjectModel;
@@ -9,10 +10,17 @@ namespace MoovieApp.ViewModels
     public partial class DetailViewModel : ObservableObject
     {
         private readonly TmdbService _tmdbService;
-        public DetailViewModel(TmdbService tmdbService)
+        private readonly DatabaseService _databaseService;
+
+
+        private const int CurrentUserId = 1; // Placeholder for current user ID
+
+        public DetailViewModel(TmdbService tmdbService, DatabaseService databaseService)
         {
             _tmdbService = tmdbService;
+            _databaseService = databaseService;
         }
+
 
         [ObservableProperty]
         private MovieModel _movie;
@@ -55,21 +63,18 @@ namespace MoovieApp.ViewModels
                 {
                     var trailer = trailersTeasers.FirstOrDefault(t => t.type == "Trailer");
 
-                    //if (trailer is null)
-                    //{
-                    //    trailer = trailersTeasers.First();
-                    //}
+              
                     var iframe = $@"
-<html>
-  <body style='margin:0;padding:0;'>
-    <iframe width='100%' height='100%' src='https://www.youtube.com/embed/{trailer.key}?rel=0&playsinline=1'
-      frameborder='0'
-      allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-      allowfullscreen>
-    </iframe>
-  </body>
-</html>";
-                    MainTrailerUrl = new HtmlWebViewSource { Html = iframe };/*GetYoutubeUrl(trailer.key);*/
+                        <html>
+                          <body style='margin:0;padding:0;'>
+                            <iframe width='100%' height='100%' src='https://www.youtube.com/embed/{trailer.key}?rel=0&playsinline=1'
+                              frameborder='0'
+                              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                              allowfullscreen>
+                            </iframe>
+                          </body>
+                        </html>";
+                    MainTrailerUrl = new HtmlWebViewSource { Html = iframe };
 
                     var details = await _tmdbService.GetMovieDetailsAsync(Movie.Id);
                     if (details is not null)
@@ -98,6 +103,66 @@ namespace MoovieApp.ViewModels
             }
 
         }
+
+
+        [RelayCommand]
+        private async Task AddToMyListAsync()
+        {
+            if (Movie is null) return;
+
+            try
+            {
+                
+                await _databaseService.AddMovieToListAsync(
+                    CurrentUserId, 
+                    Movie.Id,
+                    Movie.DisplayTitle,
+                    Movie.ThumbnailSmall 
+                );
+
+                
+                await Shell.Current.DisplayAlert("Succsess", $"{Movie.DisplayTitle} added to MyList!", "OK");
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"There was an error while trying to save the movie: {ex.Message}", "OK");
+            }
+        }
+
+
+        [RelayCommand]
+        private async Task RateMovieAsync()
+        {
+            if (Movie is null) return;
+           
+            string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{Movie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
+
+            if (int.TryParse(ratingStr, out int rating) && rating >= 1 && rating <= 5)
+            {
+                try
+                {
+                    
+                    await _databaseService.RateMovieAsync(
+                        CurrentUserId,
+                        Movie.Id,
+                        rating
+                    
+                    );
+
+                    await Shell.Current.DisplayAlert("Siker", $"Sikeresen értékelted ({rating}/5) a filmet!", "OK");
+                }
+                catch (Exception ex)
+                {
+                    await Shell.Current.DisplayAlert("Hiba", $"Hiba történt az értékeléskor: {ex.Message}", "OK");
+                }
+            }
+            else if (!string.IsNullOrEmpty(ratingStr))
+            {
+                await Shell.Current.DisplayAlert("Hiba", "Érvénytelen értékelés. Kérlek, 1 és 5 közötti számot adj meg.", "OK");
+            }
+            
+        }
+
 
         private static string GetYoutubeUrl(string key) => 
             $"https://www.youtube.com/embed/{key}";

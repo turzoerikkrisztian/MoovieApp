@@ -10,28 +10,38 @@ namespace MoovieApp.Services
 {
     public class DatabaseService
     {
-        private readonly SQLiteAsyncConnection _database;
+        private SQLiteAsyncConnection? _database;
         private static string DbPath => Path.Combine(FileSystem.AppDataDirectory, "moovieapp.db3");
 
+        private readonly Lazy<Task<SQLiteAsyncConnection>> _databaseLazyInitializer;
         public DatabaseService()
         {
-            _database = new SQLiteAsyncConnection(DbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-            InitAsync().Wait();
+            _databaseLazyInitializer = new Lazy<Task<SQLiteAsyncConnection>>(async () =>
+            {               
+                var database = new SQLiteAsyncConnection(DbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
+                await InitDatabaseAsync(database); // Meghívjuk a táblalétrehozást
+                return database;
+            });
         }
 
-        private async Task InitAsync()
-        {           
-            await _database.CreateTableAsync<User>();
-            await _database.CreateTableAsync<MovieObject>();
-            await _database.CreateTableAsync<Rating>();
-            await _database.CreateTableAsync<UserList>();
-            await _database.CreateTableAsync<Actor>();
-            await _database.CreateTableAsync<Director>();
-            await _database.CreateTableAsync<MovieActor>();
-            await _database.CreateTableAsync<MovieDirector>();
+        private async Task InitDatabaseAsync(SQLiteAsyncConnection database)
+        {
+            await database.CreateTableAsync<User>();
+            await database.CreateTableAsync<MovieObject>();
+            await database.CreateTableAsync<Rating>();
+            await database.CreateTableAsync<UserList>();
+            await database.CreateTableAsync<Actor>();
+            await database.CreateTableAsync<Director>();
+            await database.CreateTableAsync<MovieActor>();
+            await database.CreateTableAsync<MovieDirector>();
         }
 
-       
+        private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
+        {
+           
+            return _database ??= await _databaseLazyInitializer.Value;
+        }
+
         public async Task AddMovieToListAsync(int userId, int movieId, string title, string posterUrl)
         {            
             var movie = new MovieObject

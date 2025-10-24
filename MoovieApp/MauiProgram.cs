@@ -32,6 +32,7 @@ public static class MauiProgram
         builder.Services.AddSingleton<MainPage>();
         builder.Services.AddTransient<DetailViewModel>();
         builder.Services.AddTransient<MovieDetailsPage>();
+        builder.Services.AddSingleton<DatabaseService>();
 
 #if ANDROID
 Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>

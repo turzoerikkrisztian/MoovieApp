@@ -66,23 +66,25 @@
                 <Label Grid.Row="1"
                        Grid.Column="1"
                        Text="{Binding Movie.ReleaseDate}"
-                       TextColor="AntiqueWhite"
+                       TextColor="White"
                        FontSize="12"/>
 
                 <Label Grid.Row="2"
                        Grid.Column="1"
                        Text="{Binding Movie.Overview}"
-                       TextColor="AntiqueWhite"
+                       TextColor="White"
                        />
             </Grid>
 
             <Grid ColumnDefinitions="*, *, *"
                   Margin="0, 5, 0, 5">
                 <Grid Grid.Column="0">
-                    <ImageButton Source="list_alt.svg"/>
+                    <ImageButton Source="list_alt.svg"
+                                 Command="{Binding AddToMyListCommand}"/>
                 </Grid>
                 <Grid Grid.Column="1">
-                    <ImageButton Source="star_rate.svg"/>
+                    <ImageButton Source="star_rate.svg"
+                                 Command="{Binding RateMovieCommand}"/>
                 </Grid>
                 <Grid Grid.Column="2"
                       >
