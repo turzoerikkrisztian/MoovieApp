@@ -1,12 +1,14 @@
-﻿namespace MoovieApp
+﻿using MoovieApp.Pages;
+
+namespace MoovieApp
 {
     public partial class App : Application
     {
-        public App()
+        public App(LoginPage loginPage)
         {
             InitializeComponent();
 
-            MainPage = new AppShell();
+            MainPage = loginPage;
         }
     }
 }

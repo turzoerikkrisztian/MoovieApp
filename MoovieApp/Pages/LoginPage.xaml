@@ -1,12 +1,40 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MoovieApp.ViewModels"
              x:Class="MoovieApp.Pages.LoginPage"
-             Title="LoginPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:AuthViewModel"
+             Title="Login"
+             BackgroundColor="Black">
+    <ScrollView>
+        <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
+            <Image Source="logofin.png" 
+                   HeightRequest="150" 
+                   HorizontalOptions="Center" />
+            <Label Text="Welcome To Moovie!" 
+                   FontSize="24" 
+                   FontAttributes="Bold"
+                   TextColor="White" 
+                   HorizontalOptions="Center" />
+
+            <Entry Placeholder="User Name (Only for registration)" Text="{Binding Username}" TextColor="Black" PlaceholderColor="Gray" BackgroundColor="White"/>
+            <Entry Placeholder="Email" Text="{Binding Email}" Keyboard="Email" TextColor="Black" PlaceholderColor="Gray" BackgroundColor="White"/>
+            <Entry Placeholder="Password" Text="{Binding Password}" Keyboard="Email" TextColor="Black" PlaceholderColor="Gray" BackgroundColor="White"/>
+
+            <Button Text="Login" 
+                    Command="{Binding LoginCommand}" 
+                    BackgroundColor="#FF5733" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    HeightRequest="50"/>
+
+            <Button Text="Register" 
+                    Command="{Binding RegisterCommand}" 
+                    BackgroundColor="#33C1FF" 
+                    TextColor="White" 
+                    CornerRadius="10" 
+                    HeightRequest="50"/>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

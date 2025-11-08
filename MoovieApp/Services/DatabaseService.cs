@@ -1,10 +1,11 @@
-﻿using SQLite;
+﻿using Microsoft.Maui.Storage;
+using MoovieApp.Models;
+using SQLite;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MoovieApp.Models;
 
 namespace MoovieApp.Services
 {
@@ -100,6 +101,37 @@ namespace MoovieApp.Services
             return await db.Table<MovieObject>()
                             .Where(m => movieIds.Contains(m.movie_id))
                             .ToListAsync();
+        }
+
+        public async Task<bool> RegisterUserAsync(string username, string email, string preferences, string password)
+        {
+            var db = await GetDatabaseAsync();
+            var existingUser = await db.Table<User>()
+                                        .Where(u => u.username == username || u.email == email)
+                                        .FirstOrDefaultAsync();
+            if (existingUser != null)
+            {
+                return false; 
+            }
+            var newUser = new User
+            {
+                username = username,
+                email = email,
+                password = password,
+                preferences = preferences
+            };
+            await db.InsertAsync(newUser);
+            return true;
+        }
+
+        public async Task<User> LoginUserAsync(string email, string passwordHash)
+        {
+            var db = await GetDatabaseAsync();
+            var user = await db.Table<User>()
+                                .Where(u => (u.email == email) 
+                                            && u.password == passwordHash)
+                                .FirstOrDefaultAsync();
+            return user;
         }
     }
 }

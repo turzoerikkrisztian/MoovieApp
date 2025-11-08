@@ -1,11 +1,15 @@
+using MoovieApp.ViewModels;
+
+
 namespace MoovieApp.Pages
 {
 
     public partial class LoginPage : ContentPage
     {
-        public LoginPage()
+        public LoginPage(AuthViewModel viewModel)
         {
             InitializeComponent();
+            BindingContext = viewModel; 
         }
     }
 }

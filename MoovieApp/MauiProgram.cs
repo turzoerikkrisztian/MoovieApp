@@ -33,9 +33,11 @@ public static class MauiProgram
         builder.Services.AddTransient<DetailViewModel>();
         builder.Services.AddTransient<MovieDetailsPage>();
         builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddTransient<AuthViewModel>();
+        builder.Services.AddTransient<LoginPage>();
 
 #if ANDROID
-Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
+        Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
 {
     if (handler.PlatformView is Android.Webkit.WebView androidWebView)
     {

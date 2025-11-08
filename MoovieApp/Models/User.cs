@@ -12,7 +12,7 @@ namespace MoovieApp.Models
     {
         [PrimaryKey, AutoIncrement]
         public int user_id { get; set; } 
-        public string name { get; set; }
+        public string username { get; set; }
         [Unique] //
         public string email { get; set; }
         public string password { get; set; }
