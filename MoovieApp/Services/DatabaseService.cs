@@ -18,9 +18,9 @@ namespace MoovieApp.Services
         public DatabaseService()
         {
             _databaseLazyInitializer = new Lazy<Task<SQLiteAsyncConnection>>(async () =>
-            {               
+            {
                 var database = new SQLiteAsyncConnection(DbPath, SQLiteOpenFlags.ReadWrite | SQLiteOpenFlags.Create | SQLiteOpenFlags.SharedCache);
-                await InitDatabaseAsync(database); 
+                await InitDatabaseAsync(database);
                 return database;
             });
         }
@@ -39,7 +39,7 @@ namespace MoovieApp.Services
 
         private async Task<SQLiteAsyncConnection> GetDatabaseAsync()
         {
-           
+
             return _database ??= await _databaseLazyInitializer.Value;
         }
 
@@ -53,8 +53,8 @@ namespace MoovieApp.Services
                 title = title,
                 poster_url = posterUrl
             };
-            
-            await db.InsertOrReplaceAsync(movie); 
+
+            await db.InsertOrReplaceAsync(movie);
 
             var listItem = new UserList
             {
@@ -62,13 +62,13 @@ namespace MoovieApp.Services
                 movie_id = movieId
             };
 
-            
+
             var existing = await db.Table<UserList>()
                                     .Where(x => x.user_id == userId && x.movie_id == movieId)
                                     .FirstOrDefaultAsync();
             if (existing == null)
             {
-                
+
                 await db.InsertAsync(listItem);
             }
         }
@@ -84,15 +84,15 @@ namespace MoovieApp.Services
                 rating = rating,
                 rating_text = ratingText
             };
-           
+
             await db.InsertOrReplaceAsync(newRating);
         }
 
         public async Task<List<MovieObject>> GetUserListAsync(int userId)
         {
-            var db = await GetDatabaseAsync(); 
+            var db = await GetDatabaseAsync();
 
-            var userListItems = await db.Table<UserList>()         
+            var userListItems = await db.Table<UserList>()
                                          .Where(x => x.user_id == userId)
                                          .ToListAsync();
 
@@ -111,7 +111,7 @@ namespace MoovieApp.Services
                                         .FirstOrDefaultAsync();
             if (existingUser != null)
             {
-                return false; 
+                return false;
             }
             var newUser = new User
             {
@@ -128,10 +128,18 @@ namespace MoovieApp.Services
         {
             var db = await GetDatabaseAsync();
             var user = await db.Table<User>()
-                                .Where(u => (u.email == email) 
+                                .Where(u => (u.email == email)
                                             && u.password == passwordHash)
                                 .FirstOrDefaultAsync();
             return user;
+        }
+
+        public async Task<User> GetUserAsync(int userId)
+        {
+            var db = await GetDatabaseAsync();
+            return await db.Table<User>()
+                            .Where(u => u.user_id == userId)
+                            .FirstOrDefaultAsync();
         }
     }
 }

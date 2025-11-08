@@ -33,8 +33,10 @@ public static class MauiProgram
         builder.Services.AddTransient<DetailViewModel>();
         builder.Services.AddTransient<MovieDetailsPage>();
         builder.Services.AddSingleton<DatabaseService>();
-        builder.Services.AddTransient<AuthViewModel>();
-        builder.Services.AddTransient<LoginPage>();
+        builder.Services.AddSingleton<AuthViewModel>();
+        builder.Services.AddSingleton<LoginPage>();
+        builder.Services.AddSingleton<ProfileViewModel>();
+        builder.Services.AddSingleton<UserDetailsPage>();
 
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>

@@ -1,12 +1,85 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MoovieApp.ViewModels"
+             xmlns:models="clr-namespace:MoovieApp.Models"
              x:Class="MoovieApp.Pages.UserDetailsPage"
-             Title="UserDetailsPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:ProfileViewModel"
+             Title="UserDetailsPage"
+             BackgroundColor="Black">
+
+
+    <Grid RowDefinitions="Auto, *">
+        <Border Grid.Row="0" 
+                Margin="10" 
+                Padding="20" 
+                BackgroundColor="red" 
+                StrokeShape="RoundRectangle 15">
+            <VerticalStackLayout Spacing="10">
+                <Image Source="for_you.png" 
+                       HeightRequest="80" 
+                       WidthRequest="80" 
+                       HorizontalOptions="Center"/>
+                <Label Text="{Binding UserName}" 
+                       TextColor="White" 
+                       FontSize="24" 
+                       FontAttributes="Bold" 
+                       HorizontalOptions="Center"
+                       VerticalOptions="Start"/>
+
+                <Button Text="Log Out" 
+                        Command="{Binding LogoutCommand}" 
+                        BackgroundColor="Black" 
+                        FontAttributes="Bold"
+                        TextColor="White"
+                        HorizontalOptions="Center"
+                        Margin="0,10,0,0"/>
+            </VerticalStackLayout>
+        </Border>
+        <Grid Grid.Row="1"
+              RowDefinitions="Auto, *"
+              Padding="10">
+            <Label Text="My List"
+                   TextColor="Red"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   HorizontalTextAlignment="Center"
+                   Margin="0,0,0,10"/>
+            <CollectionView Grid.Row="1"
+                            ItemsSource="{Binding MyList}">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="3"
+                                     VerticalItemSpacing="10"
+                                     HorizontalItemSpacing="10"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.EmptyView>
+                    <VerticalStackLayout VerticalOptions="Center"
+                                         HorizontalOptions="Center">
+                        <Label Text="No movies saved yet."
+                               TextColor="White"
+                               FontAttributes="Bold"
+                               FontSize="15"/>
+                    </VerticalStackLayout>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:MovieObject">
+                        <Border StrokeShape="RoundRectangle 10"
+                                StrokeThickness="0"
+                                BackgroundColor="Red">
+                            <Grid>
+                                <Image Source="{Binding poster_url}"
+                                       Aspect="AspectFill"
+                                       HeightRequest="160"
+                                       VerticalOptions="Start"/>
+                            </Grid>
+
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+                
+            </CollectionView>
+
+        </Grid>
+    </Grid>
 </ContentPage>

@@ -11,12 +11,12 @@ namespace MoovieApp.ViewModels
         private readonly TmdbService _tmdbService;
         private readonly DatabaseService _databaseService;
 
-        private const int CurrentUserId = 1; // Placeholder for current user ID
+        //private const int CurrentUserId = 1; 
 
         public HomeViewModel(TmdbService tmdbService, DatabaseService databaseService)
         {
             _tmdbService = tmdbService;
-            _databaseService = databaseService; // Should get assigned here
+            _databaseService = databaseService;
         }
 
 
@@ -98,10 +98,17 @@ namespace MoovieApp.ViewModels
             movie ??= TrendingMovie;
             if (movie is null) return;
 
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Log in to save movies", "ok");
+                return;
+            }
+
             try
             {
                 await _databaseService.AddMovieToListAsync(
-                    CurrentUserId,
+                    userId,
                     TrendingMovie.Id,
                     TrendingMovie.DisplayTitle,
                     TrendingMovie.ThumbnailSmall
@@ -120,6 +127,13 @@ namespace MoovieApp.ViewModels
 
             movie ??= TrendingMovie;
             if (movie is null) return;
+            
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Log in to rate movies", "ok");
+                return;
+            }
 
             string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{TrendingMovie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
 
@@ -128,7 +142,7 @@ namespace MoovieApp.ViewModels
                 try
                 {
                     await _databaseService.RateMovieAsync(
-                        CurrentUserId,
+                        userId,
                         TrendingMovie.Id,
                         rating
                     );

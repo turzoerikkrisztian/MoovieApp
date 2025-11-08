@@ -13,7 +13,7 @@ namespace MoovieApp.ViewModels
         private readonly DatabaseService _databaseService;
 
 
-        private const int CurrentUserId = 1; // Placeholder for current user ID
+       /* private const int CurrentUserId = 1;*/ // Placeholder for current user ID
 
         public DetailViewModel(TmdbService tmdbService, DatabaseService databaseService)
         {
@@ -86,7 +86,7 @@ namespace MoovieApp.ViewModels
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Not Found", "No trailer available for this movie.", "OK");
+                    //await Shell.Current.DisplayAlert("Not Found", "No trailer available for this movie.", "OK");
                 }
                 var similarMovies = await similarMoviesTask;
                 SimilarMovies.Clear();
@@ -110,11 +110,18 @@ namespace MoovieApp.ViewModels
         {
             if (Movie is null) return;
 
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Log in to save movies", "ok");
+                return;
+            }
+
             try
             {
                 
                 await _databaseService.AddMovieToListAsync(
-                    CurrentUserId, 
+                    userId, 
                     Movie.Id,
                     Movie.DisplayTitle,
                     Movie.ThumbnailSmall 
@@ -134,7 +141,14 @@ namespace MoovieApp.ViewModels
         private async Task RateMovieAsync()
         {
             if (Movie is null) return;
-           
+
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Shell.Current.DisplayAlert("Error", "Log in to rate movies", "ok");
+                return;
+            }
+
             string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{Movie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
 
             if (int.TryParse(ratingStr, out int rating) && rating >= 1 && rating <= 5)
@@ -143,7 +157,7 @@ namespace MoovieApp.ViewModels
                 {
                     
                     await _databaseService.RateMovieAsync(
-                        CurrentUserId,
+                        userId,
                         Movie.Id,
                         rating
                     
