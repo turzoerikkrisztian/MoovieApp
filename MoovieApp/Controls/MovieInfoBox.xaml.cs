@@ -30,9 +30,7 @@ public partial class MovieInfoBox : ContentView
     public event EventHandler<MovieEventArgs>? AddToListClicked;
     public event EventHandler<MovieEventArgs>? RateClicked;
 
-
     public ICommand ClosedCommand { get; private set; }
-
 
     public MovieInfoBox()
 	{
@@ -40,7 +38,6 @@ public partial class MovieInfoBox : ContentView
 		ClosedCommand = new Command(ExecuteClosedCommand);
 	}
 	   
-
     private void ExecuteClosedCommand()
     {
         Closed?.Invoke(this, EventArgs.Empty);
@@ -51,8 +48,6 @@ public partial class MovieInfoBox : ContentView
         Closed?.Invoke(this, EventArgs.Empty);
     }
 
-
-
     private async void ImageButton_Details_Clicked(object sender, EventArgs e)
     {
         if (Movie is null) return;
@@ -60,15 +55,30 @@ public partial class MovieInfoBox : ContentView
         await Shell.Current.GoToAsync(nameof(MovieDetailsPage), true, parameters);
     }
 
+    public static readonly BindableProperty IsRemoveModeProperty =
+        BindableProperty.Create(nameof(IsRemoveMode), typeof(bool),
+        typeof(MovieInfoBox), defaultValue: false);
 
-    private void AddToList_Clicked(object sender, EventArgs e)
+    public bool IsRemoveMode
     {
-        if (Movie is not null)
-        {
-            AddToListClicked?.Invoke(this, new MovieEventArgs(Movie));
-        }
+        get => (bool)GetValue(IsRemoveModeProperty);
+        set => SetValue(IsRemoveModeProperty, value);
     }
 
+    public event EventHandler<MovieEventArgs>? RemoveClicked;
+
+    private void AddOrRemoveList_Clicked(object sender, EventArgs e)
+    {
+        if (Movie is null) return;
+        if (IsRemoveMode)
+        {
+            RemoveClicked?.Invoke(this, new MovieEventArgs(Movie));
+        }
+        else
+        {
+            AddToListClicked?.Invoke(this, new MovieEventArgs(Movie));
+        }       
+    }
 
     private void Rate_Clicked(object sender, EventArgs e)
     {
@@ -78,7 +88,5 @@ public partial class MovieInfoBox : ContentView
         }
     }
 
-
-
-
+    
 }

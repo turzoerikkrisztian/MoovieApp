@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:vm="clr-namespace:MoovieApp.ViewModels"
              xmlns:models="clr-namespace:MoovieApp.Models"
+             xmlns:controls="clr-namespace:MoovieApp.Controls"
              x:Class="MoovieApp.Pages.UserDetailsPage"
              x:DataType="vm:ProfileViewModel"
              Title="UserDetailsPage"
@@ -44,7 +45,7 @@
                    FontSize="20"
                    FontAttributes="Bold"
                    HorizontalTextAlignment="Center"
-                   Margin="0,0,0,10"/>
+                   Margin="5,0,0,10"/>
             <CollectionView Grid.Row="1"
                             ItemsSource="{Binding MyList}">
                 <CollectionView.ItemsLayout>
@@ -67,6 +68,11 @@
                         <Border StrokeShape="RoundRectangle 10"
                                 StrokeThickness="0"
                                 BackgroundColor="Red">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ProfileViewModel}}, Path=SelectMovieCommand}"
+                                                       CommandParameter="{Binding .}"/>
+                            </Border.GestureRecognizers>
+                            
                             <Grid>
                                 <Image Source="{Binding poster_url}"
                                        Aspect="AspectFill"
@@ -81,5 +87,15 @@
             </CollectionView>
 
         </Grid>
+
+        <controls:MovieInfoBox Grid.Row="0" Grid.RowSpan="2"
+                               Movie="{Binding SelectedMovie}"
+                               IsVisible="{Binding ShowMovieInfoBox}"
+                               IsRemoveMode="True"
+                               VerticalOptions="End"
+                               Closed="MovieInfoBox_Closed"
+                               RemoveClicked="MovieInfoBox_RemoveClicked"
+                               RateClicked="MovieInfoBox_RateClicked"/>
+
     </Grid>
 </ContentPage>

@@ -124,7 +124,8 @@ namespace MoovieApp.ViewModels
                     userId, 
                     Movie.Id,
                     Movie.DisplayTitle,
-                    Movie.ThumbnailSmall 
+                    Movie.ThumbnailSmall,
+                    Movie.Overview
                 );
 
                 
@@ -149,7 +150,7 @@ namespace MoovieApp.ViewModels
                 return;
             }
 
-            string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{Movie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
+            string ratingStr = await Shell.Current.DisplayPromptAsync("Rate Movie", $"How many stars do you give to \"{Movie.DisplayTitle}\"(1-5)", keyboard: Keyboard.Numeric);
 
             if (int.TryParse(ratingStr, out int rating) && rating >= 1 && rating <= 5)
             {
@@ -163,16 +164,16 @@ namespace MoovieApp.ViewModels
                     
                     );
 
-                    await Shell.Current.DisplayAlert("Siker", $"Sikeresen értékelted ({rating}/5) a filmet!", "OK");
+                    await Shell.Current.DisplayAlert("Thank You", $"You rated the movie ({rating}/5)!", "OK");
                 }
                 catch (Exception ex)
                 {
-                    await Shell.Current.DisplayAlert("Hiba", $"Hiba történt az értékeléskor: {ex.Message}", "OK");
+                    await Shell.Current.DisplayAlert("Error", $"An error occurred while submitting your rating: {ex.Message}", "OK");
                 }
             }
             else if (!string.IsNullOrEmpty(ratingStr))
             {
-                await Shell.Current.DisplayAlert("Hiba", "Érvénytelen értékelés. Kérlek, 1 és 5 közötti számot adj meg.", "OK");
+                await Shell.Current.DisplayAlert("Error", "Invalid rating please give a rating between 1-5", "OK");
             }
             
         }

@@ -43,7 +43,7 @@ namespace MoovieApp.Services
             return _database ??= await _databaseLazyInitializer.Value;
         }
 
-        public async Task AddMovieToListAsync(int userId, int movieId, string title, string posterUrl)
+        public async Task AddMovieToListAsync(int userId, int movieId, string title, string posterUrl, string overview)
         {
             var db = await GetDatabaseAsync();
 
@@ -51,7 +51,8 @@ namespace MoovieApp.Services
             {
                 movie_id = movieId,
                 title = title,
-                poster_url = posterUrl
+                poster_url = posterUrl,
+                overview = overview 
             };
 
             await db.InsertOrReplaceAsync(movie);
@@ -140,6 +141,18 @@ namespace MoovieApp.Services
             return await db.Table<User>()
                             .Where(u => u.user_id == userId)
                             .FirstOrDefaultAsync();
+        }
+
+        public async Task RemoveMovieFromListAsync(int userId, int movieId)
+        {
+            var db = await GetDatabaseAsync();
+            var itemToRemove = await db.Table<UserList>()
+                                 .Where(x => x.user_id == userId && x.movie_id == movieId)
+                                 .FirstOrDefaultAsync();
+            if (itemToRemove != null)
+            {
+                await db.DeleteAsync(itemToRemove);
+            }
         }
     }
 }

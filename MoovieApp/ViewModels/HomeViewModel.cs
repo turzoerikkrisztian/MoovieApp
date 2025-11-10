@@ -38,8 +38,7 @@ namespace MoovieApp.ViewModels
 
 
         public async Task InitalizeAsync()
-        {
-            // ... (meglévő kód) ...
+        {           
             try
             {
                 var trendingMoviesTask = _tmdbService.GetTrendingMoviesAsync();
@@ -109,15 +108,16 @@ namespace MoovieApp.ViewModels
             {
                 await _databaseService.AddMovieToListAsync(
                     userId,
-                    TrendingMovie.Id,
-                    TrendingMovie.DisplayTitle,
-                    TrendingMovie.ThumbnailSmall
+                    movie.Id,
+                    movie.DisplayTitle,
+                    movie.ThumbnailSmall,
+                    movie.Overview
                 );
-                await Shell.Current.DisplayAlert("Siker", $"{TrendingMovie.DisplayTitle} hozzáadva a listádhoz!", "OK");
+                await Shell.Current.DisplayAlert("Succsess", $"{movie.DisplayTitle} added to list!", "OK");
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Hiba", $"Hiba történt a mentéskor: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlert("Error", $"Error when trying to add movie to list: {ex.Message}", "OK");
             }
         }
 
@@ -135,7 +135,8 @@ namespace MoovieApp.ViewModels
                 return;
             }
 
-            string ratingStr = await Shell.Current.DisplayPromptAsync("Értékelés", $"Hány csillagot adsz a(z) \"{TrendingMovie.DisplayTitle}\" filmre? (1-5)", keyboard: Keyboard.Numeric);
+            string ratingStr = await Shell.Current.DisplayPromptAsync("Rating", 
+                $"How many stars would you give \"{movie.DisplayTitle}\"? (1-5)", keyboard: Keyboard.Numeric);
 
             if (int.TryParse(ratingStr, out int rating) && rating >= 1 && rating <= 5)
             {
@@ -143,19 +144,19 @@ namespace MoovieApp.ViewModels
                 {
                     await _databaseService.RateMovieAsync(
                         userId,
-                        TrendingMovie.Id,
+                        movie.Id,
                         rating
                     );
-                    await Shell.Current.DisplayAlert("Siker", $"Sikeresen értékelted ({rating}/5) a filmet!", "OK");
+                    await Shell.Current.DisplayAlert("Thank You", $"You rated the movie ({rating}/5)!", "OK");
                 }
                 catch (Exception ex)
                 {
-                    await Shell.Current.DisplayAlert("Hiba", $"Hiba történt az értékeléskor: {ex.Message}", "OK");
+                    await Shell.Current.DisplayAlert("Error", $"An error occurred while submitting your rating: {ex.Message}", "OK");
                 }
             }
             else if (!string.IsNullOrEmpty(ratingStr))
             {
-                await Shell.Current.DisplayAlert("Hiba", "Érvénytelen értékelés. Kérlek, 1 és 5 közötti számot adj meg.", "OK");
+                await Shell.Current.DisplayAlert("Error", "Invalid rating please give a rating between 1-5", "OK");
             }
         }
 

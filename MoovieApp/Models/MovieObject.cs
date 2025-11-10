@@ -15,6 +15,7 @@ namespace MoovieApp.Models
         public string title { get; set; }
         public string genre { get; set; } 
         public int release_year { get; set; } 
-        public string poster_url { get; set; } 
+        public string poster_url { get; set; }
+        public string overview { get; set; }
     }
 }
