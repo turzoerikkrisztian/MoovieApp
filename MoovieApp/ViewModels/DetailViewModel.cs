@@ -160,8 +160,12 @@ namespace MoovieApp.ViewModels
                     await _databaseService.RateMovieAsync(
                         userId,
                         Movie.Id,
-                        rating
-                    
+                        rating,
+                        Movie.DisplayTitle,
+                        Movie.ThumbnailSmall,
+                        Movie.Overview
+
+
                     );
 
                     await Shell.Current.DisplayAlert("Thank You", $"You rated the movie ({rating}/5)!", "OK");

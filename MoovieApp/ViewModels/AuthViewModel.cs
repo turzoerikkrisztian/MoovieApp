@@ -9,10 +9,12 @@ namespace MoovieApp.ViewModels
     public partial class AuthViewModel : ObservableObject
     {
         private readonly DatabaseService _databaseService;
+        private readonly IServiceProvider _serviceProvider;
 
-        public AuthViewModel(DatabaseService databaseService)
+        public AuthViewModel(DatabaseService databaseService, IServiceProvider serviceProvider)
         {
             _databaseService = databaseService;
+            _serviceProvider = serviceProvider;
         }
 
         [ObservableProperty]
@@ -71,7 +73,15 @@ namespace MoovieApp.ViewModels
             var success = await _databaseService.RegisterUserAsync(Username, Email, UserPreferences ?? "", Password);
             if (success)
             {
-                await ShowAlert("Success", "Registration successful! You can now log in.", "OK");
+               var user = await _databaseService.LoginUserAsync(Email, Password);
+                if (user != null)
+                {
+                    Preferences.Set("current_user_id", user.user_id);
+                    Preferences.Set("current_username", user.username);    
+                    
+                    var onboardingPage = _serviceProvider.GetRequiredService<OnborardingPage>();
+                    Application.Current.MainPage = onboardingPage;
+                }
             }
             else
             {

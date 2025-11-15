@@ -85,6 +85,9 @@
 	  <MauiXaml Update="Pages\MovieDetailsPage.xaml">
 	    <Generator></Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Pages\OnborardingPage.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Pages\UserDetailsPage.xaml">
 	    <Generator></Generator>
 	  </MauiXaml>

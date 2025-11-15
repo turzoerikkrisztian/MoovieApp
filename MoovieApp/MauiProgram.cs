@@ -38,6 +38,11 @@ public static class MauiProgram
         builder.Services.AddSingleton<ProfileViewModel>();
         builder.Services.AddSingleton<UserDetailsPage>();
 
+        builder.Services.AddSingleton<RecommendationService>();
+        builder.Services.AddTransient<ForYouViewModel>();
+        builder.Services.AddTransient<OnborardingPage>();
+        builder.Services.AddTransient<OnboardingViewModel>();
+
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
 {

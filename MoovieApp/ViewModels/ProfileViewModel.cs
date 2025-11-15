@@ -137,7 +137,7 @@ namespace MoovieApp.ViewModels
             {
                 try
                 {
-                    await _databaseService.RateMovieAsync(userId, movie.Id, rating);
+                    await _databaseService.RateMovieAsync(userId, movie.Id, rating, movie.DisplayTitle, movie.ThumbnailSmall, movie.Overview);
                     await Application.Current.MainPage.DisplayAlert("Thank You", $"You rated \"{movie.DisplayTitle}\" You rated", "OK");
                 }
                 catch (Exception ex)
