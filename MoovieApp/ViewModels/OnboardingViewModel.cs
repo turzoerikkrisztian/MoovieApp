@@ -29,9 +29,9 @@ namespace MoovieApp.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
-        public async Task InitalizeAsync()
+        public async Task InitializeAsync()
         {
-            _isBusy = true;
+            IsBusy = true;
             try
             {
                 var movies = await _tmdbService.GetTrendingMoviesAsync();
@@ -48,12 +48,15 @@ namespace MoovieApp.ViewModels
             catch (Exception ex)
             {
 
-                await Shell.Current.DisplayAlert("Error", $"Failed to load movies: {ex.Message}", "OK");
+                if (Application.Current?.MainPage != null)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load movies: {ex.Message}", "OK");
+                }
                 FinishOnBoarding();
             }
             finally
             {
-                _isBusy = false;
+                IsBusy = false;
             }
         }
 
@@ -93,11 +96,13 @@ namespace MoovieApp.ViewModels
 
         }
 
-
+        [RelayCommand]
         private void FinishOnBoarding()
         {
             Application.Current.MainPage = new AppShell();
         }
+
+        
 
     }
 }

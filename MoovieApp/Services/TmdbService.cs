@@ -96,7 +96,9 @@ namespace MoovieApp.Services
         public string name { get; set; }
         public bool video { get; set; }
         //public string media_type { get; set; } // "movie" or "tv"
+
         public string ThumbnailPath => poster_path ?? backdrop_path;
+
         public string Thumbnail => $"https://image.tmdb.org/t/p/w600_and_h900_bestv2/{ThumbnailPath}";
         public string ThumbnailSmall => $"https://image.tmdb.org/t/p/w220_and_h330_face/{ThumbnailPath}";
         public string ThumbnailUrl => $"https://image.tmdb.org/t/p/original/{ThumbnailPath}";

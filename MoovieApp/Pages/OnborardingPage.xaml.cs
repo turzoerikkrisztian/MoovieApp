@@ -18,6 +18,6 @@ public partial class OnborardingPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-        await _viewModel.InitalizeAsync();
+        await _viewModel.InitializeAsync();
     }
 }
