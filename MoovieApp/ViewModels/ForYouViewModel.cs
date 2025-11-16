@@ -49,15 +49,19 @@ namespace MoovieApp.ViewModels
 
             try
             {
+        
+                var seenMovieIds = await _databaseService.GetAllInteractedMovieAsync(userId);
+
                 var listMovies = await _databaseService.GetUserListAsync(userId);
                 var ratedMovies = await _databaseService.GetRatedMoviesAsync(userId);
+
 
                 var allUserMovies = listMovies.Concat(ratedMovies)
                     .GroupBy(m => m.movie_id)
                     .Select(g => g.First())                  
                     .ToList();
 
-                var seenMovieIds = new HashSet<int>(allUserMovies.Select(m => m.movie_id));
+             
 
 
                 var likedMoviesForService = allUserMovies
@@ -85,6 +89,8 @@ namespace MoovieApp.ViewModels
                     StatusMessage = "Moovies For You:";
                     foreach (var id in recommendedMovies)
                     {
+                        if (seenMovieIds.Contains(id)) continue;
+
                         var movie = candidates.FirstOrDefault(c => c.Id == id);
                         if (movie != null)
                         {
@@ -92,7 +98,7 @@ namespace MoovieApp.ViewModels
                         }
                     }
                 }
-                else
+                if(Recommendations.Count == 0)
                 {
                     StatusMessage = "No recommendations available at the moment. Here are some trending Moovies:";
                     

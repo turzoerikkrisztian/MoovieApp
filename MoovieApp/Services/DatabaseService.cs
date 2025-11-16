@@ -178,5 +178,30 @@ namespace MoovieApp.Services
                 await db.DeleteAsync(itemToRemove);
             }
         }
+
+        public async Task<HashSet<int>> GetAllInteractedMovieAsync(int userId)
+        {
+            var db = await GetDatabaseAsync();
+
+            var ratedIds = await db.Table<Rating>()
+                                        .Where(r => r.user_id == userId)                                        
+                                        .ToListAsync();
+
+            var listIds = await db.Table<UserList>()
+                                        .Where(l => l.user_id == userId)                                        
+                                        .ToListAsync();
+
+            var ids = new HashSet<int>();
+            foreach (var rating in ratedIds)
+            {
+                ids.Add(rating.movie_id);
+            }
+            foreach (var list in listIds)
+            {
+                ids.Add(list.movie_id);
+            }
+
+            return ids;
+        }
     }
 }
