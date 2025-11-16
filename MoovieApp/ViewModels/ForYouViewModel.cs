@@ -23,10 +23,10 @@ namespace MoovieApp.ViewModels
             _databaseService = databaseService;
             _recommendationService = recommendationService;
 
-            Recomendations = new ObservableCollection<MovieModel>();
+            Recommendations = new ObservableCollection<MovieModel>();
         }
 
-        public ObservableCollection<MovieModel> Recomendations { get; }
+        public ObservableCollection<MovieModel> Recommendations { get; }
 
         [ObservableProperty]
         private bool _isBusy;
@@ -34,7 +34,7 @@ namespace MoovieApp.ViewModels
         [ObservableProperty]
         private string _statusMessage;
 
-        public async Task InitalizeAsync()
+        public async Task InitializeAsync()
         {
             int userId = Preferences.Get("current_user_id", 0);
             if (userId == 0)
@@ -45,7 +45,7 @@ namespace MoovieApp.ViewModels
 
             IsBusy = true;
             StatusMessage = "Loading recommendations...";
-            Recomendations.Clear();
+            Recommendations.Clear();
 
             try
             {
@@ -54,14 +54,19 @@ namespace MoovieApp.ViewModels
 
                 var allUserMovies = listMovies.Concat(ratedMovies)
                     .GroupBy(m => m.movie_id)
-                    .Select(g => g.First())
-                    .Select(dbMovie => new MovieModel
-                    {
-                        Id = dbMovie.movie_id,
-                        Overview = dbMovie.overview
-                    })
+                    .Select(g => g.First())                  
                     .ToList();
 
+                var seenMovieIds = new HashSet<int>(allUserMovies.Select(m => m.movie_id));
+
+
+                var likedMoviesForService = allUserMovies
+                    .Select(m => new MovieModel
+                    {
+                        Id = m.movie_id,
+                        Overview = m.overview
+                    })
+                    .ToList();
 
                 if (!allUserMovies.Any())
                 {
@@ -72,7 +77,7 @@ namespace MoovieApp.ViewModels
 
                 var candidates = (await _tmdbService.GetTrendingMoviesAsync()).ToList();
 
-                var recommendedMovies = await _recommendationService.GetRecommendationAsync(allUserMovies, candidates);
+                var recommendedMovies = await _recommendationService.GetRecommendationAsync(likedMoviesForService, candidates);
 
 
                 if (recommendedMovies.Any())
@@ -83,16 +88,21 @@ namespace MoovieApp.ViewModels
                         var movie = candidates.FirstOrDefault(c => c.Id == id);
                         if (movie != null)
                         {
-                            Recomendations.Add(movie);
+                            Recommendations.Add(movie);
                         }
                     }
                 }
                 else
                 {
                     StatusMessage = "No recommendations available at the moment. Here are some trending Moovies:";
-                    foreach (var movie in candidates.Take(10))
+                    
+                    var fallbackMovies = candidates
+                        .Where(m => !seenMovieIds.Contains(m.Id))
+                        .Take(10);
+
+                    foreach (var movie in fallbackMovies)
                     {
-                        Recomendations.Add(movie);
+                        Recommendations.Add(movie);
                     }
                 }
 
@@ -106,6 +116,76 @@ namespace MoovieApp.ViewModels
                 IsBusy = false;
             }
         }
+
+
+        [RelayCommand]
+        private async Task AddToListAsync(MovieModel movie)
+        {
+            if (movie == null) return;
+
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Please log in to add movies to your list.", "OK");
+                return;
+            }
+
+            try
+            {
+                await _databaseService.AddMovieToListAsync(
+                    userId,
+                    movie.Id,
+                    movie.DisplayTitle,
+                    movie.ThumbnailSmall,
+                    movie.Overview
+                    );
+                await Application.Current.MainPage.DisplayAlert("Success", $"{movie.DisplayTitle} has been added to your list.", "OK");
+            }
+            catch (Exception ex)
+            {
+
+                await Application.Current.MainPage.DisplayAlert("Error", $"Could not add movie to list: {ex.Message}", "OK");
+            }
+        }
+
+        [RelayCommand]
+        private async Task RateMovieAsync(MovieModel movie)
+        {
+            if (movie == null) return;
+
+            int userId = Preferences.Get("current_user_id", 0);
+            if (userId == 0)
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Please log in to rate movies.", "OK");
+                return;
+            }
+            string result = await Application.Current.MainPage.DisplayPromptAsync("Rate Movie", $"Rate {movie.DisplayTitle} (1 to 5):", keyboard: Keyboard.Numeric);
+            
+            if (int.TryParse(result, out int rating) && rating >= 1 && rating <= 5)
+            {              
+                try
+                {
+                    await _databaseService.RateMovieAsync(
+                        userId,
+                        movie.Id,
+                        rating,
+                        movie.DisplayTitle,
+                        movie.ThumbnailSmall,
+                        movie.Overview                        
+                        );
+                    await Application.Current.MainPage.DisplayAlert("Success", $"You rated {movie.DisplayTitle} with {rating} stars.", "OK");
+                }
+                catch (Exception ex)
+                {
+                    await Application.Current.MainPage.DisplayAlert("Error", $"Could not rate movie: {ex.Message}", "OK");
+                }
+            }
+            else
+            {
+                await Application.Current.MainPage.DisplayAlert("Error", "Invalid rating input.", "OK");
+            }
+        }
+
 
         [RelayCommand]
         private async Task GoToDetailsAsync(MovieModel movie)

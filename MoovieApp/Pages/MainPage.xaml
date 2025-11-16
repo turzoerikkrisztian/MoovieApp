@@ -33,22 +33,27 @@
                               >
                             
                         </Grid>
-                        <Grid Grid.Column="1">      
-            <Border StrokeShape="RoundRectangle 0,0,10,10" 
-                    BackgroundColor="Black"
-                    Opacity="0.9"
-                    HorizontalOptions="Center"
-                    VerticalOptions="Start">
-                        
-               <Label Text="Welcome To Moovie!" 
-                   HorizontalOptions="Center"
-                   FontSize="30"
-                   TextColor="Red"                   
-                   FontAttributes="Bold"/>
-                        
-                    </Border>
+                        <Grid Grid.Column="1">
+     
+                     <Border StrokeShape="RoundRectangle 0,0,10,10" 
+                            BackgroundColor="Black"
+                            Opacity="0.9"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Start">
+
+                        <Label Text="Welcome To Moovie!" 
+                           HorizontalOptions="Center"
+                           FontSize="30"
+                           TextColor="Red"                   
+                           FontAttributes="Bold"/>
+
+                
+
+                                </Border>
+ 
                         </Grid>
                     </Grid>
+                    
                     <HorizontalStackLayout
             HorizontalOptions="Center"
             VerticalOptions="End"

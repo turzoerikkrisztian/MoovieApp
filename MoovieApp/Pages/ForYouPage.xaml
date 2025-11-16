@@ -1,12 +1,104 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:vm="clr-namespace:MoovieApp.ViewModels"
+             xmlns:models="clr-namespace:MoovieApp.Models"
+             x:DataType="vm:ForYouViewModel"
              x:Class="MoovieApp.Pages.ForYouPage"
-             Title="ForYouPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             Title="For You"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="Red">
+
+
+    <Grid RowDefinitions=" Auto, Auto, Auto, *">
+        <Border StrokeShape="RoundRectangle 0,0,10,10"
+                BackgroundColor="Black"
+                >
+        <Label
+            Grid.Row="0"
+            Text="For You"
+            TextColor="White"
+            FontSize="30"
+            FontAttributes="Bold"
+            HorizontalTextAlignment="Center"/>
+        </Border>
+        <Label Grid.Row="1" 
+               Text="{Binding StatusMessage}"
+               TextColor="White"
+               FontSize="18"
+               FontAttributes="Bold"
+               HorizontalTextAlignment="Center"
+               Margin="15,15,15,5"/>
+
+        <ActivityIndicator Grid.Row="2"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="White"
+                           HorizontalOptions="Center"/>
+
+        <CollectionView Grid.Row="3"
+                        ItemsSource="{Binding Recommendations}"
+                        Margin="10">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" 
+                                 Span="2" 
+                                 VerticalItemSpacing="15"
+                                 HorizontalItemSpacing="15"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:MovieModel">
+                    <Border StrokeShape="RoundRectangle 15"
+                            StrokeThickness="0"
+                            BackgroundColor="Black"
+                            Margin="0,0,0,10">
+
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command=
+                                                  "{Binding Source=
+                                {RelativeSource AncestorType=
+                                {x:Type vm:ForYouViewModel}}, 
+                                Path=GoToDetailsCommand}"/>
+                        </Border.GestureRecognizers>
+
+                        <Grid RowDefinitions="Auto, Auto">
+                            <Image Grid.Row="0"
+                                   Source="{Binding ThumbnailSmall}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="220"/>
+                            
+                            <Grid Grid.Row="1"
+                                  ColumnDefinitions="*,*"
+                                  Padding="5"
+                                  ColumnSpacing="10">
+
+                                <ImageButton Grid.Column="0"
+                                             Source="list_alt_add.png"
+                                             HeightRequest="30"
+                                             WidthRequest="30"
+                                             BackgroundColor="Transparent"
+                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ForYouViewModel}}, Path=AddToListCommand}"
+                                             CommandParameter="{Binding .}"/>
+
+                                <ImageButton Grid.Column="1"
+                                             Source="star_rate.svg"
+                                             HeightRequest="30"
+                                             WidthRequest="30"
+                                             BackgroundColor="Transparent"
+                                             Command="{Binding Source={RelativeSource AncestorType={x:Type vm:ForYouViewModel}}, Path=RateMovieCommand}"
+                                             CommandParameter="{Binding .}"/>
+
+                            </Grid>
+                        </Grid>
+                        
+                        
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            
+        </CollectionView>
+    </Grid>
+
+
+
 </ContentPage>

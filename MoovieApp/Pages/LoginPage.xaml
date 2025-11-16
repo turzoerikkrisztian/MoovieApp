@@ -5,12 +5,16 @@
              x:Class="MoovieApp.Pages.LoginPage"
              x:DataType="vm:AuthViewModel"
              Title="Login"
-             BackgroundColor="Black">
+             BackgroundColor="black">
     <ScrollView>
         <VerticalStackLayout Spacing="20" Padding="30" VerticalOptions="Center">
-            <Image Source="logofin.png" 
-                   HeightRequest="150" 
-                   HorizontalOptions="Center" />
+           
+                <Image Source="kinfo.png" 
+                        HeightRequest="150" 
+                       HorizontalOptions="Center" 
+                       />   
+     
+            
             <Label Text="Welcome To Moovie!" 
                    FontSize="24" 
                    FontAttributes="Bold"
@@ -23,14 +27,14 @@
 
             <Button Text="Login" 
                     Command="{Binding LoginCommand}" 
-                    BackgroundColor="#FF5733" 
+                    BackgroundColor="red" 
                     TextColor="White" 
                     CornerRadius="10" 
                     HeightRequest="50"/>
 
             <Button Text="Register" 
                     Command="{Binding RegisterCommand}" 
-                    BackgroundColor="#33C1FF" 
+                    BackgroundColor="grey" 
                     TextColor="White" 
                     CornerRadius="10" 
                     HeightRequest="50"/>

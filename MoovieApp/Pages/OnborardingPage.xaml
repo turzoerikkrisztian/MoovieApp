@@ -12,49 +12,70 @@
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-
+    
     <Grid RowDefinitions="*, Auto, Auto" Padding="20">
 
         <ActivityIndicator IsRunning="{Binding IsBusy}" 
                            IsVisible="{Binding IsBusy}" 
                            HorizontalOptions="Center" VerticalOptions="Center" Color="Red"/>
-
-        <Border Grid.Row="0" StrokeShape="RoundRectangle 20" StrokeThickness="0" 
-                BackgroundColor="#1c1c1c" IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+        
+        <Border Grid.Row="0" 
+                StrokeShape="RoundRectangle 20" 
+                StrokeThickness="0" 
+                BackgroundColor="#1c1c1c" 
+                IsVisible="{Binding IsBusy, Converter={StaticResource InvertedBoolConverter}}">
+            
             <Grid>
+                
                 <Image Source="{Binding CurrentMovie.Thumbnail}" Aspect="AspectFill" Opacity="0.7"/>
-                <VerticalStackLayout VerticalOptions="End" BackgroundColor="#CC000000" Padding="15">
-                    <Label Text="{Binding CurrentMovie.DisplayTitle}" TextColor="White" FontSize="24" FontAttributes="Bold" HorizontalTextAlignment="Center"/>
+                <VerticalStackLayout VerticalOptions="End" 
+                                     BackgroundColor="#CC000000" 
+                                     Padding="15">
+                    <Label Text="{Binding CurrentMovie.DisplayTitle}" 
+                           TextColor="White" 
+                           FontSize="24" 
+                           FontAttributes="Bold" 
+                           HorizontalTextAlignment="Center"/>
+                   
                 </VerticalStackLayout>
             </Grid>
         </Border>
 
         <HorizontalStackLayout Grid.Row="1" Spacing="30" HorizontalOptions="Center" Margin="0,30,0,20">
-            <ImageButton Source="dislike.svg"  
+            <ImageButton 
+                         Source="dislike.svg"  
                          Command="{Binding RateCommand}" 
                          CommandParameter="Dislike" 
                          BackgroundColor="#333" 
                          HeightRequest="70" 
                          WidthRequest="70" 
-                         CornerRadius="35"/>
+                         CornerRadius="35"
+                         />
             <ImageButton 
-                Source="next.svg"  
-                Command="{Binding RateCommand}" 
-                CommandParameter="Skip" 
-                BackgroundColor="Transparent" 
-                VerticalOptions="Center"/>
+                         Source="next.svg"  
+                         Command="{Binding RateCommand}" 
+                         CommandParameter="Skip" 
+                         BackgroundColor="Transparent" 
+                         VerticalOptions="Center"
+                         HeightRequest="70" 
+                         WidthRequest="70" />
             <ImageButton 
-                Source="like.svg"  
-                Command="{Binding RateCommand}" 
-                CommandParameter="Like" 
-                BackgroundColor="#E50914" 
-                HeightRequest="70" 
-                WidthRequest="70" 
-                CornerRadius="35"/>
+                        Source="like.svg"  
+                        Command="{Binding RateCommand}" 
+                        CommandParameter="Like" 
+                        BackgroundColor="#E50914" 
+                        HeightRequest="70" 
+                        WidthRequest="70" 
+                        CornerRadius="35"/>
         </HorizontalStackLayout>
 
-        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0" BackgroundColor="Transparent" Grid.Row="2">
-            <Button Text="Finish" Command="{Binding FinishOnboardingCommand}" BackgroundColor="Transparent" TextColor="White"/>
+        <Border StrokeShape="RoundRectangle 10" StrokeThickness="0" BackgroundColor="red" Grid.Row="2">
+            <Button Text="Finish" 
+                    FontAttributes="Bold"
+                    FontSize="18"
+                    Command="{Binding FinishOnboardingCommand}" 
+                    BackgroundColor="Transparent" 
+                    TextColor="White"/>
         </Border>
     </Grid>
 </ContentPage>

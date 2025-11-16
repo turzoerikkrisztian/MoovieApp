@@ -42,6 +42,7 @@ public static class MauiProgram
         builder.Services.AddTransient<ForYouViewModel>();
         builder.Services.AddTransient<OnborardingPage>();
         builder.Services.AddTransient<OnboardingViewModel>();
+        builder.Services.AddTransient<ForYouPage>();
 
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>

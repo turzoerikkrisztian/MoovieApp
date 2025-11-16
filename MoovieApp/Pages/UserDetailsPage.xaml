@@ -7,7 +7,8 @@
              x:Class="MoovieApp.Pages.UserDetailsPage"
              x:DataType="vm:ProfileViewModel"
              Title="UserDetailsPage"
-             BackgroundColor="Black">
+             BackgroundColor="Black"
+             Shell.NavBarIsVisible="False">
 
 
     <Grid RowDefinitions="Auto, *">
