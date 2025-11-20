@@ -52,7 +52,7 @@ def recommend():
         return jsonify({'recommendations': recommended_ids})
 
     except Exception as e:
-        print(f"Hiba: {e}")
+        print(f"Error: {e}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
