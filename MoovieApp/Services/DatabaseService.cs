@@ -74,29 +74,7 @@ namespace MoovieApp.Services
             }
         }
 
-        public async Task RateMovieAsync(int userId, int movieId, int rating, string title, string posterUrl, string overview, string ratingText = null)
-        {
-            var db = await GetDatabaseAsync();
-
-            var movie = new MovieObject
-            {
-                movie_id = movieId,
-                title = title,
-                poster_url = posterUrl,
-                overview = overview
-            };
-            await db.InsertOrReplaceAsync(movie);
-
-            var newRating = new Rating
-            {
-                user_id = userId,
-                movie_id = movieId,
-                rating = rating,
-                rating_text = ratingText
-            };
-
-            await db.InsertOrReplaceAsync(newRating);
-        }
+        
 
         public async Task<List<MovieObject>> GetRatedMoviesAsync(int userId)
         {

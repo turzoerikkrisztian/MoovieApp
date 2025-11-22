@@ -63,18 +63,24 @@ namespace MoovieApp.ViewModels
                 {
                     var trailer = trailersTeasers.FirstOrDefault(t => t.type == "Trailer");
 
-              
+
                     var iframe = $@"
-                        <html>
-                          <body style='margin:0;padding:0;'>
-                            <iframe width='100%' height='100%' src='https://www.youtube.com/embed/{trailer.key}?rel=0&playsinline=1'
-                              frameborder='0'
-                              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                              allowfullscreen>
-                            </iframe>
-                          </body>
-                        </html>";
-                    MainTrailerUrl = new HtmlWebViewSource { Html = iframe };
+                    <html>
+                      <body style='margin:0;padding:0;'>
+                        <iframe width='100%' height='100%' 
+                          src='https://www.youtube-nocookie.com/embed/{trailer.key}?rel=0&playsinline=1'
+                          frameborder='0'
+                          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                          referrerpolicy='strict-origin-when-cross-origin'
+                          allowfullscreen>
+                        </iframe>
+                      </body>
+                    </html>";
+                    MainTrailerUrl = new HtmlWebViewSource 
+                    {
+                        Html = iframe,
+                        BaseUrl = "https://www.youtube.com"
+                    };
 
                     var details = await _tmdbService.GetMovieDetailsAsync(Movie.Id);
                     if (details is not null)

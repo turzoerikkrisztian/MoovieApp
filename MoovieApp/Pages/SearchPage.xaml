@@ -2,11 +2,78 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="MoovieApp.Pages.SearchPage"
-             Title="SearchPage">
-    <VerticalStackLayout>
-        <Label 
-            Text="Welcome to .NET MAUI!"
-            VerticalOptions="Center" 
-            HorizontalOptions="Center" />
-    </VerticalStackLayout>
+             x:DataType="vm:SearchViewModel"
+             xmlns:vm= "clr-namespace:MoovieApp.ViewModels"
+             xmlns:models= "clr-namespace:MoovieApp.Models"
+             Title="SearchPage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="Black">
+
+
+    <Grid RowDefinitions="Auto, *">
+        
+        <SearchBar Grid.Row="0"
+                   Placeholder="Search For Moovies"
+                   Text="{Binding SearchText}"
+                   SearchCommand="{Binding SearchMoviesCommand}"
+                   TextColor="White"
+                   FontAttributes="Bold"
+                   PlaceholderColor="White"
+                   Background="Red"
+                   Margin="10"
+                   />
+
+        <ActivityIndicator Grid.Row="1"
+                           IsRunning="{Binding IsBusy}"
+                           IsVisible="{Binding IsBusy}"
+                           Color="red"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
+
+        <CollectionView Grid.Row="1"
+                        ItemsSource="{Binding SearchResults}"
+                        Margin="10">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="3"
+                                 VerticalItemSpacing="10"
+                                 HorizontalItemSpacing="10"/>
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.EmptyView>
+                <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <Label Text="Search For Some Moovies!" 
+                           TextColor="red" 
+                           FontSize="20"
+                           FontAttributes="Bold"/>
+                </VerticalStackLayout>
+            </CollectionView.EmptyView>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:MovieModel">
+                    <Border StrokeShape="RoundRectangle 10"
+                            StrokeThickness="0"
+                            BackgroundColor="Red">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding Source={RelativeSource 
+                                AncestorType={x:Type 
+                                vm:SearchViewModel}}, 
+                                Path=GoDetailCommand}"
+                                CommandParameter="{Binding .}"/>
+                        </Border.GestureRecognizers>
+
+                        <Grid>
+                            <Image Source="{Binding ThumbnailSmall}"
+                                   Aspect="AspectFill"
+                                   HeightRequest="160"/>
+                        </Grid>
+                    </Border>
+
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+            
+        </CollectionView>
+
+
+    </Grid>
 </ContentPage>

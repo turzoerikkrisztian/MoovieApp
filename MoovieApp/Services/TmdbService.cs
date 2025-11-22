@@ -57,7 +57,21 @@ namespace MoovieApp.Services
                     .Select(r => r.ToMovieObject());
         }
 
-       
+        public async Task<IEnumerable<MovieModel>> SearchMoviesAsync(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+                return Enumerable.Empty<MovieModel>();
+
+            string encodedQuery = System.Net.WebUtility.UrlEncode(query);
+
+            string url = $"{TmdbUrls.Search}" +
+                $"?query={encodedQuery}" +
+                $"&include_adult=false&language=en-US&page=1";
+
+            return await GetMovieModelsAsync(url);
+        }
+
+
     }
 
     public static class TmdbUrls
@@ -146,7 +160,7 @@ namespace MoovieApp.Services
         public bool adult { get; set; }
         public string backdrop_path { get; set; }
         public object belongs_to_collection { get; set; }
-        public int budget { get; set; }
+        public long budget { get; set; }
         public Genre[] genres { get; set; }
         public string homepage { get; set; }
         public int id { get; set; }
@@ -159,7 +173,7 @@ namespace MoovieApp.Services
         public Production_Companies[] production_companies { get; set; }
         public Production_Countries[] production_countries { get; set; }
         public string release_date { get; set; }
-        public int revenue { get; set; }
+        public long revenue { get; set; }
         public int runtime { get; set; }
         public Spoken_Languages[] spoken_languages { get; set; }
         public string status { get; set; }

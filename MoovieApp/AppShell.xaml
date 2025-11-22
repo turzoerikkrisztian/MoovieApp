@@ -15,11 +15,20 @@
             ContentTemplate="{DataTemplate pages:MainPage}"
             Route="MainPage" 
             />
+
+        <ShellContent 
+            Title="Search"
+            Icon="search.svg"
+            ContentTemplate="{DataTemplate pages:SearchPage}"
+            Route="SearchPage" 
+            />
+        
         <ShellContent 
             Title="For You"
             Icon="sentiment_satisfied.svg"
             ContentTemplate="{DataTemplate pages:ForYouPage}"
             Route="ForYouPage" />
+        
         <ShellContent 
             Title="Profile"
             Icon="for_you.svg"

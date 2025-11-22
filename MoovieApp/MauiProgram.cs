@@ -44,6 +44,9 @@ public static class MauiProgram
         builder.Services.AddTransient<OnboardingViewModel>();
         builder.Services.AddTransient<ForYouPage>();
 
+        builder.Services.AddTransient<SearchViewModel>();
+        builder.Services.AddTransient<SearchPage>();
+
 #if ANDROID
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("media", (handler, view) =>
 {
@@ -51,6 +54,7 @@ public static class MauiProgram
     {
         androidWebView.Settings.JavaScriptEnabled = true;
         androidWebView.Settings.MediaPlaybackRequiresUserGesture = false;
+        androidWebView.Settings.DomStorageEnabled = true;
     }
 });
 #endif
