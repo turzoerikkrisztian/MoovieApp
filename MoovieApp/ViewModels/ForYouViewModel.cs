@@ -1,14 +1,14 @@
-﻿using System;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using MoovieApp.Models;
+using MoovieApp.Pages;
+using MoovieApp.Services;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Input;
-using MoovieApp.Models;
-using MoovieApp.Services;
-using System.Collections.ObjectModel;
-using MoovieApp.Pages;
 
 namespace MoovieApp.ViewModels
 {
@@ -37,6 +37,9 @@ namespace MoovieApp.ViewModels
         public async Task InitializeAsync()
         {
             int userId = Preferences.Get("current_user_id", 0);
+
+            System.Diagnostics.Debug.WriteLine($"[DEBUG] ForYouViewModel - Current UserID: {userId}");
+
             if (userId == 0)
             {
                 StatusMessage = "Please log in to see recommendations.";
@@ -51,6 +54,9 @@ namespace MoovieApp.ViewModels
             {
         
                 var seenMovieIds = await _databaseService.GetAllInteractedMovieAsync(userId);
+
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie Count: {seenMovieIds.Count}");
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie IDs: {string.Join(", ", seenMovieIds)}");
 
                 var listMovies = await _databaseService.GetUserListAsync(userId);
                 var ratedMovies = await _databaseService.GetRatedMoviesAsync(userId);
@@ -83,31 +89,48 @@ namespace MoovieApp.ViewModels
 
                 var recommendedMovies = await _recommendationService.GetRecommendationAsync(likedMoviesForService, candidates);
 
+                var validRecommendations = recommendedMovies
+                .Where(id => !seenMovieIds.Contains(id))
+                .Select(id => candidates.FirstOrDefault(c => c.Id == id))
+                .Where(m => m != null)
+                .ToList();
 
-                if (recommendedMovies.Any())
+
+                if (validRecommendations.Any())
                 {
                     StatusMessage = "Moovies For You:";
-                    foreach (var id in recommendedMovies)
+                    foreach (var movie in validRecommendations)
                     {
-                        if (seenMovieIds.Contains(id)) continue;
+                        Recommendations.Add(movie!);
+                        //if (seenMovieIds.Contains(id))
+                        //{
+                        //    System.Diagnostics.Debug.WriteLine($"[DEBUG] Filtering out server recommendation ID: {id} (Already seen)");
+                        //    continue;
+                        //}
 
-                        var movie = candidates.FirstOrDefault(c => c.Id == id);
-                        if (movie != null)
-                        {
-                            Recommendations.Add(movie);
-                        }
+                        //var movie = candidates.FirstOrDefault(c => c.Id == id);
+                        //if (movie != null)
+                        //{
+                        //    Recommendations.Add(movie);
+                        //}
                     }
                 }
                 if(Recommendations.Count == 0)
                 {
                     StatusMessage = "No recommendations available at the moment. Here are some trending Moovies:";
-                    
+
+                    System.Diagnostics.Debug.WriteLine("[DEBUG] Running Fallback Logic");
+
                     var fallbackMovies = candidates
                         .Where(m => !seenMovieIds.Contains(m.Id))
                         .Take(10);
 
                     foreach (var movie in fallbackMovies)
                     {
+                        if (seenMovieIds.Contains(movie.Id))
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR: Fallback trying to add seen movie: {movie.Id}");
+                        }
                         Recommendations.Add(movie);
                     }
                 }
@@ -116,6 +139,7 @@ namespace MoovieApp.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Failed to load recommendations: {ex.Message}";
+            
             }
             finally
             {

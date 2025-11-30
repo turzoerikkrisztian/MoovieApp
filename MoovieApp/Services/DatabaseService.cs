@@ -52,7 +52,7 @@ namespace MoovieApp.Services
                 movie_id = movieId,
                 title = title,
                 poster_url = posterUrl,
-                overview = overview 
+                overview = overview
             };
 
             await db.InsertOrReplaceAsync(movie);
@@ -74,7 +74,7 @@ namespace MoovieApp.Services
             }
         }
 
-        
+
 
         public async Task<List<MovieObject>> GetRatedMoviesAsync(int userId)
         {
@@ -162,11 +162,11 @@ namespace MoovieApp.Services
             var db = await GetDatabaseAsync();
 
             var ratedIds = await db.Table<Rating>()
-                                        .Where(r => r.user_id == userId)                                        
+                                        .Where(r => r.user_id == userId)
                                         .ToListAsync();
 
             var listIds = await db.Table<UserList>()
-                                        .Where(l => l.user_id == userId)                                        
+                                        .Where(l => l.user_id == userId)
                                         .ToListAsync();
 
             var ids = new HashSet<int>();
@@ -180,6 +180,45 @@ namespace MoovieApp.Services
             }
 
             return ids;
+        }
+
+        public async Task RateMovieAsync(int userId, int movieId, int rating, string title, string posterUrl, string overview, string ratingText = null)
+        {
+            var db = await GetDatabaseAsync();
+
+            var movie = new MovieObject
+            {
+                movie_id = movieId,
+                title = title,
+                poster_url = posterUrl,
+                overview = overview
+            };
+            await db.InsertOrReplaceAsync(movie);
+
+            var existingRating = await db.Table<Rating>()
+            .Where(r => r.user_id == userId && r.movie_id == movieId)
+            .FirstOrDefaultAsync();
+
+            if (existingRating != null)
+            {
+                existingRating.rating = rating;
+                existingRating.rating_text = ratingText;
+                await db.UpdateAsync(existingRating);
+            }
+            else
+            {
+
+
+                var newRating = new Rating
+                {
+                    user_id = userId,
+                    movie_id = movieId,
+                    rating = rating,
+                    rating_text = ratingText
+                };
+
+                await db.InsertAsync(newRating);
+            }
         }
     }
 }

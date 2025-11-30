@@ -29,6 +29,9 @@ namespace MoovieApp.ViewModels
         [ObservableProperty]
         private bool _isBusy;
 
+        [ObservableProperty]
+        private bool _isRating;
+
         public async Task InitializeAsync()
         {
             IsBusy = true;
@@ -47,7 +50,7 @@ namespace MoovieApp.ViewModels
             }
             catch (Exception ex)
             {
-
+                System.Diagnostics.Debug.WriteLine($"[ERROR] Onboarding Initialize: {ex.Message}");
                 if (Application.Current?.MainPage != null)
                 {
                     await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load movies: {ex.Message}", "OK");
@@ -64,9 +67,16 @@ namespace MoovieApp.ViewModels
         private void ShowNextMovie()
         {
             if (_moviesQueue.Count > 0)
+            {
                 CurrentMovie = _moviesQueue.Dequeue();
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Showing next movie: {CurrentMovie.DisplayTitle} (ID: {CurrentMovie.Id})");
+            }
             else
+            {
+                System.Diagnostics.Debug.WriteLine("[DEBUG] No more movies, finishing onboarding.");
                 FinishOnBoarding();
+
+            }
         }
 
         
@@ -75,30 +85,60 @@ namespace MoovieApp.ViewModels
         [RelayCommand]
         private async Task RateAsync(string ratingType)
         {
-            int userId = Preferences.Get("current_user_id", 0);
-            if (userId == 0) return;
 
+            if (IsRating) return;
+            IsRating = true;
 
-            int ratingValue = ratingType == "Like" ? 5 : 1;
-
-            if (ratingType != "Skip" && CurrentMovie != null)
+            try
             {
-                await _databaseService.RateMovieAsync(
-                    userId,
-                    CurrentMovie.Id,
-                    ratingValue,
-                    CurrentMovie.DisplayTitle,
-                    CurrentMovie.ThumbnailSmall,
-                    CurrentMovie.Overview);
-            }
+                int userId = Preferences.Get("current_user_id", 0);
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Rating movie. UserID: {userId}, Type: {ratingType}");
 
-            ShowNextMovie();
+                if (userId == 0)
+                {
+                    System.Diagnostics.Debug.WriteLine("[ERROR] UserID is 0! Cannot save rating.");
+                    return;
+                }
+
+                int ratingValue = ratingType == "Like" ? 5 : 1;
+
+                if (ratingType != "Skip" && CurrentMovie != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[DEBUG] Saving rating for movie: {CurrentMovie.Id}");
+                    await _databaseService.RateMovieAsync(
+                        userId,
+                        CurrentMovie.Id,
+                        ratingValue,
+                        CurrentMovie.DisplayTitle,
+                        CurrentMovie.ThumbnailSmall,
+                        CurrentMovie.Overview);
+
+                    System.Diagnostics.Debug.WriteLine("[DEBUG] Rating saved successfully.");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("[DEBUG] Skipped or CurrentMovie is null.");
+                }
+
+                ShowNextMovie();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[ERROR] RateAsync failed: {ex}");
+                await Application.Current.MainPage.DisplayAlert("Error", "Failed to save rating. Please try again.", "OK");
+            }
+            finally
+            {
+                IsRating = false;
+            }
+            
 
         }
 
         [RelayCommand]
         private void FinishOnBoarding()
         {
+            System.Diagnostics.Debug.WriteLine("[DEBUG] Finishing onboarding, navigating to AppShell.");
             Application.Current.MainPage = new AppShell();
         }
 
