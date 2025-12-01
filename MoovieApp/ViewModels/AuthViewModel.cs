@@ -53,7 +53,6 @@ namespace MoovieApp.ViewModels
             {
                 Preferences.Set("current_user_id", user.user_id);
                 Preferences.Set("current_username", user.username);
-
                 Application.Current.MainPage = new AppShell();
             }
             else

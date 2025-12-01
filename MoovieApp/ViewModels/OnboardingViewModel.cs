@@ -50,7 +50,6 @@ namespace MoovieApp.ViewModels
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"[ERROR] Onboarding Initialize: {ex.Message}");
                 if (Application.Current?.MainPage != null)
                 {
                     await Application.Current.MainPage.DisplayAlert("Error", $"Failed to load movies: {ex.Message}", "OK");
@@ -62,44 +61,24 @@ namespace MoovieApp.ViewModels
                 IsBusy = false;
             }
         }
-
-        
+       
         private void ShowNextMovie()
         {
-            if (_moviesQueue.Count > 0)
-            {
-                CurrentMovie = _moviesQueue.Dequeue();
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Showing next movie: {CurrentMovie.DisplayTitle} (ID: {CurrentMovie.Id})");
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("[DEBUG] No more movies, finishing onboarding.");
-                FinishOnBoarding();
+            if (_moviesQueue.Count > 0) CurrentMovie = _moviesQueue.Dequeue();
 
-            }
+            else FinishOnBoarding();
         }
-
-        
-
 
         [RelayCommand]
         private async Task RateAsync(string ratingType)
         {
-
             if (IsRating) return;
             IsRating = true;
 
             try
             {
-                int userId = Preferences.Get("current_user_id", 0);
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Rating movie. UserID: {userId}, Type: {ratingType}");
-
-                if (userId == 0)
-                {
-                    System.Diagnostics.Debug.WriteLine("[ERROR] UserID is 0! Cannot save rating.");
-                    return;
-                }
-
+                int userId = Preferences.Get("current_user_id", 0);                
+                if (userId == 0) return;
                 int ratingValue = ratingType == "Like" ? 5 : 1;
 
                 if (ratingType != "Skip" && CurrentMovie != null)
@@ -112,27 +91,17 @@ namespace MoovieApp.ViewModels
                         CurrentMovie.DisplayTitle,
                         CurrentMovie.ThumbnailSmall,
                         CurrentMovie.Overview);
-
-                    System.Diagnostics.Debug.WriteLine("[DEBUG] Rating saved successfully.");
                 }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("[DEBUG] Skipped or CurrentMovie is null.");
-                }
-
                 ShowNextMovie();
             }
             catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"[ERROR] RateAsync failed: {ex}");
+            {               
                 await Application.Current.MainPage.DisplayAlert("Error", "Failed to save rating. Please try again.", "OK");
             }
             finally
             {
                 IsRating = false;
             }
-            
-
         }
 
         [RelayCommand]

@@ -207,8 +207,6 @@ namespace MoovieApp.Services
             }
             else
             {
-
-
                 var newRating = new Rating
                 {
                     user_id = userId,
@@ -216,7 +214,6 @@ namespace MoovieApp.Services
                     rating = rating,
                     rating_text = ratingText
                 };
-
                 await db.InsertAsync(newRating);
             }
         }
