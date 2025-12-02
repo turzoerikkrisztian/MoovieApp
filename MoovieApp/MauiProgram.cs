@@ -55,6 +55,7 @@ public static class MauiProgram
         androidWebView.Settings.JavaScriptEnabled = true;
         androidWebView.Settings.MediaPlaybackRequiresUserGesture = false;
         androidWebView.Settings.DomStorageEnabled = true;
+        androidWebView.SetWebChromeClient(new Android.Webkit.WebChromeClient());
     }
 });
 #endif

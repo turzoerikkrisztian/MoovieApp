@@ -29,6 +29,12 @@
                 </VerticalStackLayout.Triggers>
                 <WebView Source="{Binding MainTrailerUrl}"
                          HeightRequest="250"/>
+                <Button Text="Watch Trailer"
+                        Command="{Binding OpenTrailerInBrowserCommand}"
+                        BackgroundColor="Red"
+                        TextColor="White"
+                        FontAttributes="Bold"
+                        Margin="10,5,10,0"/>
                 <VerticalStackLayout Padding="10"
                                      Margin="5">
                     <Label Text="{Binding Movie.DisplayTitle}"

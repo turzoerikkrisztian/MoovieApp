@@ -65,18 +65,18 @@ namespace MoovieApp.ViewModels
 
 
                     var iframe = $@"
-                    <html>
-                      <body style='margin:0;padding:0;'>
-                        <iframe width='100%' height='100%' 
-                          src='https://www.youtube-nocookie.com/embed/{trailer.key}?rel=0&playsinline=1'
-                          frameborder='0'
-                          allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
-                          referrerpolicy='strict-origin-when-cross-origin'
-                          allowfullscreen>
-                        </iframe>
-                      </body>
-                    </html>";
-                    MainTrailerUrl = new HtmlWebViewSource 
+                        <html>
+                          <body style='margin:0;padding:0;'>
+                            <iframe width='100%' height='100%' 
+                              src='https://www.youtube.com/embed/{trailer.key}?rel=0&playsinline=1'
+                              frameborder='0'
+                              allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture'
+                              referrerpolicy='strict-origin-when-cross-origin'
+                              allowfullscreen>
+                            </iframe>
+                          </body>
+                        </html>";
+                    MainTrailerUrl = new HtmlWebViewSource
                     {
                         Html = iframe,
                         BaseUrl = "https://www.youtube.com"
@@ -110,6 +110,29 @@ namespace MoovieApp.ViewModels
 
         }
 
+        [RelayCommand]
+        private async Task OpenTrailerInBrowserAsync()
+        {
+                       if (Movie is null) return;
+            var trailersTeasers = await _tmdbService.GetTrailersAsync(Movie.Id);
+            if (trailersTeasers?.Any() == true)
+            {
+                var trailer = trailersTeasers.FirstOrDefault(t => t.type == "Trailer");
+                if (trailer is not null)
+                {
+                    var youtubeUrl = GetYoutubeUrl(trailer.key);
+                    await Launcher.OpenAsync(youtubeUrl);
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Not Found", "No trailer available for this movie.", "OK");
+                }
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Not Found", "No trailer available for this movie.", "OK");
+            }
+        }
 
         [RelayCommand]
         private async Task AddToMyListAsync()
