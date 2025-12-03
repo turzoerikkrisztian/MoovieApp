@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static SQLite.SQLite3;
 
 namespace MoovieApp.ViewModels
 {
@@ -36,10 +37,7 @@ namespace MoovieApp.ViewModels
 
         public async Task InitializeAsync()
         {
-            int userId = Preferences.Get("current_user_id", 0);
-
-            System.Diagnostics.Debug.WriteLine($"[DEBUG] ForYouViewModel - Current UserID: {userId}");
-
+            int userId = Preferences.Get("current_user_id", 0);        
             if (userId == 0)
             {
                 StatusMessage = "Please log in to see recommendations.";
@@ -54,6 +52,7 @@ namespace MoovieApp.ViewModels
             {
         
                 var seenMovieIds = await _databaseService.GetAllInteractedMovieAsync(userId);
+                
 
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie Count: {seenMovieIds.Count}");
                 System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie IDs: {string.Join(", ", seenMovieIds)}");
@@ -67,7 +66,9 @@ namespace MoovieApp.ViewModels
                     .Select(g => g.First())                  
                     .ToList();
 
-             
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Movies sent to Python: {allUserMovies.Count}");
+
+
 
 
                 var likedMoviesForService = allUserMovies
@@ -85,34 +86,69 @@ namespace MoovieApp.ViewModels
                     return;
                 }
 
-                var candidates = (await _tmdbService.GetTrendingMoviesAsync()).ToList();
+                var candidates = new List<MovieModel>();    
+
+                var generalTasks = new List<Task<IEnumerable<MovieModel>>>();
+
+                for (int i = 1; i <= 3; i++)
+                {
+                    generalTasks.Add(_tmdbService.GetTrendingMoviesAsync(page: i));
+                    generalTasks.Add(_tmdbService.GetTopRatedMoviesAsync(page: i));
+                }
+              
+                var myRatings = await _databaseService.GetUserRatingsAsync(userId);
+
+                var myFavorites = myRatings
+                    .Where(r => r.rating >= 4)
+                    .OrderBy(x => Guid.NewGuid())
+                    .Take(3)
+                    .Select(r => r.movie_id)
+                    .ToList();
+
+                if (!myFavorites.Any()) 
+                        myFavorites = listMovies
+                        .OrderBy(x => Guid.NewGuid())
+                        .Take(3)
+                        .Select(m => m.movie_id)
+                        .ToList();
+
+
+                foreach (var fav in myFavorites)
+                {
+                    generalTasks.Add(_tmdbService.GetSimilarAsync(fav));
+                }
+
+                var results = await Task.WhenAll(generalTasks);
+               
+                foreach (var movieList in results)
+                {
+                    if (movieList != null) candidates.AddRange(movieList);
+                }
+
+                candidates = candidates.GroupBy(x => x.Id).Select(g => g.First()).ToList();
+
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Candidates pool size: {candidates.Count}");
 
                 var recommendedMovies = await _recommendationService.GetRecommendationAsync(likedMoviesForService, candidates);
+                System.Diagnostics.Debug.WriteLine($"[DEBUG] Recommendations from Python: {recommendedMovies.Count}");
 
-                var validRecommendations = recommendedMovies
-                .Where(id => !seenMovieIds.Contains(id))
-                .Select(id => candidates.FirstOrDefault(c => c.Id == id))
-                .Where(m => m != null)
-                .ToList();
+                //var validRecommendations = recommendedMovies
+                //.Where(id => !seenMovieIds.Contains(id))
+                //.Select(id => candidates.FirstOrDefault(c => c.Id == id))
+                //.Where(m => m != null)
+                //.ToList();
 
 
-                if (validRecommendations.Any())
+                if (recommendedMovies.Any())
                 {
                     StatusMessage = "Moovies For You:";
-                    foreach (var movie in validRecommendations)
+                    foreach (var id in recommendedMovies)
                     {
-                        Recommendations.Add(movie!);
-                        //if (seenMovieIds.Contains(id))
-                        //{
-                        //    System.Diagnostics.Debug.WriteLine($"[DEBUG] Filtering out server recommendation ID: {id} (Already seen)");
-                        //    continue;
-                        //}
-
-                        //var movie = candidates.FirstOrDefault(c => c.Id == id);
-                        //if (movie != null)
-                        //{
-                        //    Recommendations.Add(movie);
-                        //}
+                        if (seenMovieIds.Contains(id)) continue;
+                        
+                        var movie = candidates.FirstOrDefault(c => c.Id == id);
+                        if (movie != null)
+                            Recommendations.Add(movie);
                     }
                 }
                 if(Recommendations.Count == 0)

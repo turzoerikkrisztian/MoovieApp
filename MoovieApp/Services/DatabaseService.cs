@@ -217,5 +217,13 @@ namespace MoovieApp.Services
                 await db.InsertAsync(newRating);
             }
         }
+
+        public async Task<List<Rating>> GetUserRatingsAsync(int userId)
+        {
+            var db = await GetDatabaseAsync();
+            return await db.Table<Rating>()
+                           .Where(r => r.user_id == userId)
+                           .ToListAsync();
+        }
     }
 }

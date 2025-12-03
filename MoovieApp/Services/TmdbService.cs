@@ -19,11 +19,16 @@ namespace MoovieApp.Services
 
         private HttpClient HttpClient => _httpClientFactory.CreateClient(HttpClientName);
 
-        public async Task<IEnumerable<MovieModel>> GetTrendingMoviesAsync() =>
-            await GetMovieModelsAsync(TmdbUrls.Trending);
+        //public async Task<IEnumerable<MovieModel>> GetTrendingMoviesAsync() =>
+        //    await GetMovieModelsAsync(TmdbUrls.Trending);
+        public async Task<IEnumerable<MovieModel>> GetTrendingMoviesAsync(int page = 1) =>
+            await GetMovieModelsAsync($"{TmdbUrls.Trending}&page={page}");
 
-        public async Task<IEnumerable<MovieModel>> GetTopRatedMoviesAsync() =>
-            await GetMovieModelsAsync(TmdbUrls.TopRated);
+        //public async Task<IEnumerable<MovieModel>> GetTopRatedMoviesAsync() =>
+        //    await GetMovieModelsAsync(TmdbUrls.TopRated);
+
+        public async Task<IEnumerable<MovieModel>> GetTopRatedMoviesAsync(int page = 1) =>
+            await GetMovieModelsAsync($"{TmdbUrls.TopRated}&page={page}");
 
         public async Task<IEnumerable<MovieModel>> GetSimilarAsync(int movieId) =>
             await GetMovieModelsAsync(TmdbUrls.GetSimilar(movieId));
