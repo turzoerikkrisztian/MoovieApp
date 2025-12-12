@@ -49,27 +49,15 @@ namespace MoovieApp.ViewModels
             Recommendations.Clear();
 
             try
-            {
-        
+            {        
                 var seenMovieIds = await _databaseService.GetAllInteractedMovieAsync(userId);
-                
-
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie Count: {seenMovieIds.Count}");
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Seen Movie IDs: {string.Join(", ", seenMovieIds)}");
-
                 var listMovies = await _databaseService.GetUserListAsync(userId);
                 var ratedMovies = await _databaseService.GetRatedMoviesAsync(userId);
-
 
                 var allUserMovies = listMovies.Concat(ratedMovies)
                     .GroupBy(m => m.movie_id)
                     .Select(g => g.First())                  
                     .ToList();
-
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Movies sent to Python: {allUserMovies.Count}");
-
-
-
 
                 var likedMoviesForService = allUserMovies
                     .Select(m => new MovieModel
@@ -112,7 +100,6 @@ namespace MoovieApp.ViewModels
                         .Select(m => m.movie_id)
                         .ToList();
 
-
                 foreach (var fav in myFavorites)
                 {
                     generalTasks.Add(_tmdbService.GetSimilarAsync(fav));
@@ -127,17 +114,7 @@ namespace MoovieApp.ViewModels
 
                 candidates = candidates.GroupBy(x => x.Id).Select(g => g.First()).ToList();
 
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Candidates pool size: {candidates.Count}");
-
                 var recommendedMovies = await _recommendationService.GetRecommendationAsync(likedMoviesForService, candidates);
-                System.Diagnostics.Debug.WriteLine($"[DEBUG] Recommendations from Python: {recommendedMovies.Count}");
-
-                //var validRecommendations = recommendedMovies
-                //.Where(id => !seenMovieIds.Contains(id))
-                //.Select(id => candidates.FirstOrDefault(c => c.Id == id))
-                //.Where(m => m != null)
-                //.ToList();
-
 
                 if (recommendedMovies.Any())
                 {
@@ -155,18 +132,12 @@ namespace MoovieApp.ViewModels
                 {
                     StatusMessage = "No recommendations available at the moment. Here are some trending Moovies:";
 
-                    System.Diagnostics.Debug.WriteLine("[DEBUG] Running Fallback Logic");
-
                     var fallbackMovies = candidates
                         .Where(m => !seenMovieIds.Contains(m.Id))
                         .Take(10);
 
                     foreach (var movie in fallbackMovies)
                     {
-                        if (seenMovieIds.Contains(movie.Id))
-                        {
-                            System.Diagnostics.Debug.WriteLine($"[DEBUG] ERROR: Fallback trying to add seen movie: {movie.Id}");
-                        }
                         Recommendations.Add(movie);
                     }
                 }
@@ -174,8 +145,7 @@ namespace MoovieApp.ViewModels
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Failed to load recommendations: {ex.Message}";
-            
+                StatusMessage = $"Failed to load recommendations: {ex.Message}";            
             }
             finally
             {

@@ -113,13 +113,14 @@ namespace MoovieApp.ViewModels
         [RelayCommand]
         private async Task OpenTrailerInBrowserAsync()
         {
-                       if (Movie is null) return;
+            if (Movie is null) return;
             var trailersTeasers = await _tmdbService.GetTrailersAsync(Movie.Id);
             if (trailersTeasers?.Any() == true)
             {
                 var trailer = trailersTeasers.FirstOrDefault(t => t.type == "Trailer");
                 if (trailer is not null)
                 {
+                    System.Diagnostics.Debug.WriteLine($"[FALLBACK LOGIC] Opening trailer in browser with key: {trailer.key}");
                     var youtubeUrl = GetYoutubeUrl(trailer.key);
                     await Launcher.OpenAsync(youtubeUrl);
                 }

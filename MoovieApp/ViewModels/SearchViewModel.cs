@@ -39,17 +39,36 @@ namespace MoovieApp.ViewModels
             IsBusy = true;
             try
             {
-                var result = await _tmdbService.SearchMoviesAsync(SearchText);
-
                 SearchResults.Clear();
 
-                if (result != null)
+                var titleSearchTask = _tmdbService.SearchMoviesAsync(SearchText);
+
+                var keywordId = await _tmdbService.GetKeywordIdAsync(SearchText);
+
+                IEnumerable<MovieModel> keywordResults = Enumerable.Empty<MovieModel>();
+
+                if (keywordId.HasValue)
                 {
-                    foreach (var m in result)
-                    {
-                        SearchResults.Add(m);
-                    }
+                    keywordResults = await _tmdbService.GetMoviesByKeywordAsync(keywordId.Value);
                 }
+
+                var titleResults = await titleSearchTask;
+
+                var combinedResults = new List<MovieModel>();
+
+                if (titleResults != null) combinedResults.AddRange(titleResults);
+                if (keywordResults != null) combinedResults.AddRange(keywordResults);
+
+                var uniqueResults = combinedResults
+                    .GroupBy(m => m.Id)
+                    .Select(g => g.First())
+                    .ToList();
+
+                foreach (var movie in uniqueResults)
+                {
+                    SearchResults.Add(movie);
+                }
+
             }
             catch (Exception ex)
             {

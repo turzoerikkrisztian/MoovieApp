@@ -53,7 +53,7 @@ namespace MoovieApp.Services
             var movieDetails = await HttpClient.GetFromJsonAsync<MovieDetail>(
                 $"{TmdbUrls.GetMovieDetails(id)}&api_key={ApiKey}");
             return movieDetails;
-        }   
+        }
 
         private async Task<IEnumerable<MovieModel>> GetMovieModelsAsync(string url)
         {
@@ -75,8 +75,24 @@ namespace MoovieApp.Services
 
             return await GetMovieModelsAsync(url);
         }
+        public async Task<int?> GetKeywordIdAsync(string query)
+        {
+            string encodedQuery = System.Net.WebUtility.UrlEncode(query);
+            var response = await HttpClient
+                .GetFromJsonAsync<KeywordList>($"{TmdbUrls.SearchKeyword}" +
+                $"?query={encodedQuery}&page=1&api_key={ApiKey}");
 
+            return response?.results?.FirstOrDefault()?.id;
+        }
 
+        public async Task<IEnumerable<MovieModel>> GetMoviesByKeywordAsync(int keywordId)
+        {
+            string url = $"{TmdbUrls.Discover}" +
+                $"?with_keywords={keywordId}" +
+                $"&sort_by=popularity.desc" +
+                $"&include_adult=false&language=en-US";
+            return await GetMovieModelsAsync(url);
+        }
     }
 
     public static class TmdbUrls
@@ -84,7 +100,9 @@ namespace MoovieApp.Services
         public const string Trending = "3/trending/movie/week?language=en-US";
         public const string Search = "3/search/movie";
         public const string TopRated = "3/movie/top_rated?language=en-US";
-        
+        public const string SearchKeyword = "3/search/keyword";
+        public const string Discover = "3/discover/movie";
+
 
         public static string GetTrailers(int movieId, string type = "movie") => $"3/{type ?? "movie"}/{movieId}/videos?language=en-US";
         public static string GetMovieDetails(int movieId, string type = "movie") => $"3/{type ?? "movie"}/{movieId}?language=en-US";
@@ -175,12 +193,9 @@ namespace MoovieApp.Services
         public string overview { get; set; }
         public float popularity { get; set; }
         public string poster_path { get; set; }
-        public Production_Companies[] production_companies { get; set; }
-        public Production_Countries[] production_countries { get; set; }
         public string release_date { get; set; }
         public long revenue { get; set; }
         public int runtime { get; set; }
-        public Spoken_Languages[] spoken_languages { get; set; }
         public string status { get; set; }
         public string tagline { get; set; }
         public string title { get; set; }
@@ -189,30 +204,21 @@ namespace MoovieApp.Services
         public int vote_count { get; set; }
     }
 
-    public class Production_Companies
-    {
-        public int id { get; set; }
-        public string logo_path { get; set; }
-        public string name { get; set; }
-        public string origin_country { get; set; }
-    }
-
-    public class Production_Countries
-    {
-        public string iso_3166_1 { get; set; }
-        public string name { get; set; }
-    }
-
-    public class Spoken_Languages
-    {
-        public string english_name { get; set; }
-        public string iso_639_1 { get; set; }
-        public string name { get; set; }
-    }
     public class GenreWrapper
     {
         public IEnumerable<Genre> Genres { get; set; }
     }
     public record struct Genre(int Id, string Name);
+
+    public class KeywordList
+    {
+        public List<Keyword> results { get; set; }
+    }
+
+    public class Keyword
+    {
+        public int id { get; set; }
+        public string name { get; set; }
+    }
 }
 
